@@ -29,7 +29,25 @@ export const TRANSLATIONS = {
     cabine: "Cabine",
     recharge: "Recharge",
 
+    // Sous-catégories
+    subcategories: {
+      "Réduction de volume": "Réduction de volume",
+      "Cellulite": "Cellulite",
+      "Anti-aging": "Anti-aging",
+      "Bien-être": "Bien-être",
+      "Nettoyer & Préparer": "Nettoyer & Préparer",
+      "Sérum": "Sérum",
+      "Crèmes Jour / Nuit": "Crèmes Jour / Nuit",
+      "Yeux & Lèvres": "Yeux & Lèvres",
+      "Régénérer": "Régénérer",
+      "Mains": "Mains",
+      "Nutricosmetics": "Nutricosmetics",
+      "Cosmetotextiles": "Cosmétotextiles",
+      "Consommables": "Consommables",
+    } as Record<string, string>,
+
     // Prix
+    htNote: "Tous les prix sont HT",
     prixVente: "Prix vente :",
 
     // Promo
@@ -101,6 +119,23 @@ export const TRANSLATIONS = {
     cabine: "Professionell",
     recharge: "Nachfüllung",
 
+    subcategories: {
+      "Réduction de volume": "Volumenreduzierung",
+      "Cellulite": "Cellulite",
+      "Anti-aging": "Anti-Aging",
+      "Bien-être": "Wohlbefinden",
+      "Nettoyer & Préparer": "Reinigen & Vorbereiten",
+      "Sérum": "Serum",
+      "Crèmes Jour / Nuit": "Tages- / Nachtcremes",
+      "Yeux & Lèvres": "Augen & Lippen",
+      "Régénérer": "Regenerieren",
+      "Mains": "Hände",
+      "Nutricosmetics": "Nutricosmetics",
+      "Cosmetotextiles": "Kosmetotextilien",
+      "Consommables": "Material-Bedarf",
+    } as Record<string, string>,
+
+    htNote: "Alle Preise sind exkl. MwSt.",
     prixVente: "Verkaufspreis:",
 
     promoLabel: (n: number, code: string) => `🎁 +${n} geschenkt (${code})`,

@@ -1,12 +1,12 @@
 "use client";
 
 import { Product } from "@/data/products";
-import { calcPromo, formatCHF } from "@/lib/utils";
+import { calcPromo, formatCHF, translateSize } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
 import QuantitySelector from "./QuantitySelector";
 
 interface Props {
-  products: Product[]; // 1 or 2 products (revente + cabine pair)
+  products: Product[];
   quantities: Record<string, number>;
   onChange: (ref: string, qty: number) => void;
   t: T;
@@ -33,16 +33,10 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
   return (
     <div
       className={`rounded-xl border mb-2 overflow-hidden transition-shadow ${isActive ? "shadow-md" : "shadow-sm"}`}
-      style={{
-        borderColor: isActive ? "#d598aa" : "#ded5d1",
-        backgroundColor: "white",
-      }}
+      style={{ borderColor: isActive ? "#d598aa" : "#ded5d1", backgroundColor: "white" }}
     >
       {/* Nom du produit */}
-      <div
-        className="px-4 pt-3 pb-2"
-        style={{ borderBottom: "1px solid #f0ebe9" }}
-      >
+      <div className="px-4 pt-3 pb-2" style={{ borderBottom: "1px solid #f0ebe9" }}>
         <p className="text-sm font-bold uppercase tracking-wide" style={{ color: "#2d2020" }}>
           {name}
         </p>
@@ -53,22 +47,17 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
         {/* REVENTE */}
         {revente && (
           <div
-            className={`flex-1 px-3 py-3 ${isPair ? "" : ""}`}
+            className="flex-1 px-3 py-3"
             style={isPair ? { borderRight: "1px solid #f0ebe9" } : {}}
           >
-            <div className="flex items-center gap-1.5 mb-2">
-              <span
-                className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
-                style={{ backgroundColor: "#d598aa" }}
-              >
-                {t.revente}
-              </span>
-              <span className="text-[10px]" style={{ color: "#bba8a1" }}>
-                {revente.ref}
-              </span>
-            </div>
+            <span
+              className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
+              style={{ backgroundColor: "#d598aa" }}
+            >
+              {t.revente}
+            </span>
             <p className="text-xs" style={{ color: "#bba8a1" }}>
-              {revente.size}
+              {translateSize(revente.size, lang)}
             </p>
             <p className="text-base font-bold mt-1" style={{ color: "#2d2020" }}>
               {formatCHF(revente.price)}
@@ -78,6 +67,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                 {t.prixVente} {formatCHF(revente.retailPrice)}
               </p>
             )}
+            {!revente.retailPrice && <div className="mb-2 h-4" />}
             <QuantitySelector
               value={reventeQty}
               onChange={(v) => onChange(revente.ref, v)}
@@ -102,7 +92,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
           </div>
         )}
 
-        {/* CABINE */}
+        {/* CABINE / RECHARGE */}
         {(cabine || recharge) && (() => {
           const prod = cabine || recharge!;
           const qty = cabine ? cabineQty : rechargeQty;
@@ -110,24 +100,19 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
           const bgColor = recharge ? "#e8c0cc" : "#bba8a1";
           return (
             <div className="flex-1 px-3 py-3" style={{ backgroundColor: "#faf9f8" }}>
-              <div className="flex items-center gap-1.5 mb-2">
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
-                  style={{ backgroundColor: bgColor }}
-                >
-                  {typeLabel}
-                </span>
-                <span className="text-[10px]" style={{ color: "#bba8a1" }}>
-                  {prod.ref}
-                </span>
-              </div>
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
+                style={{ backgroundColor: bgColor }}
+              >
+                {typeLabel}
+              </span>
               <p className="text-xs" style={{ color: "#bba8a1" }}>
-                {prod.size}
+                {translateSize(prod.size, lang)}
               </p>
               <p className="text-base font-bold mt-1" style={{ color: "#2d2020" }}>
                 {formatCHF(prod.price)}
               </p>
-              <div className="mb-2 mt-0" style={{ height: "1rem" }} /> {/* align with revente */}
+              <div className="mb-2 h-4" /> {/* aligne avec revente */}
               <QuantitySelector
                 value={qty}
                 onChange={(v) => onChange(prod.ref, v)}
@@ -141,17 +126,14 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
           );
         })()}
 
-        {/* Produit seul sans paire */}
+        {/* Produit seul (ni revente ni cabine dans la paire) */}
         {!hasRevente && !hasCabine && products[0] && (
           <div className="flex-1 px-3 py-3">
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[10px]" style={{ color: "#bba8a1" }}>
-                {products[0].ref}
-              </span>
-            </div>
-            <p className="text-xs" style={{ color: "#bba8a1" }}>{products[0].size}</p>
+            <p className="text-xs mb-2" style={{ color: "#bba8a1" }}>
+              {translateSize(products[0].size, lang)}
+            </p>
             <p className="text-base font-bold mt-1">{formatCHF(products[0].price)}</p>
-            <div className="mb-2" />
+            <div className="mb-2 h-4" />
             <QuantitySelector
               value={quantities[products[0].ref] || 0}
               onChange={(v) => onChange(products[0].ref, v)}

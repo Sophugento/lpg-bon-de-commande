@@ -79,7 +79,7 @@ export default function CategorySection({ category, products, quantities, onChan
                   className="text-[10px] font-bold uppercase tracking-widest mb-2 mt-1"
                   style={{ color: "#bba8a1" }}
                 >
-                  {sub}
+                  {t.subcategories[sub] ?? sub}
                 </p>
               )}
               {groupIntoPairs(prods).map((pair) => (

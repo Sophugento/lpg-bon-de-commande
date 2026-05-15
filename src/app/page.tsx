@@ -105,6 +105,9 @@ export default function Home() {
         </p>
         <p style={{ color: "#8a5565" }}>• {t.rulePromo}</p>
         <p style={{ color: "#8a5565" }}>• {t.ruleMinQty}</p>
+        <p className="pt-1 font-semibold" style={{ color: "#bf7585" }}>
+          ⚠️ {t.htNote}
+        </p>
       </div>
 
       <div className="px-4">
