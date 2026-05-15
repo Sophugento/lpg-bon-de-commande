@@ -158,7 +158,6 @@ export async function POST(req: NextRequest) {
         from: "LPG Switzerland <onboarding@resend.dev>",
         to: [toEmail],
         reply_to: contact.email,
-        cc: [contact.email],
         subject,
         html,
       }),
