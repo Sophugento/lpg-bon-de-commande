@@ -15,7 +15,6 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
   const name = lang === "de" ? nameDe : nameFr;
   const description = lang === "de" ? info.descriptionDe : info.description;
   const benefits = lang === "de" ? info.benefitsDe : info.benefits;
-  const seeMore = lang === "de" ? "Mehr auf lpg-group.com →" : "Voir sur lpg-group.com →";
 
   return (
     <div
@@ -69,17 +68,6 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
                 </li>
               ))}
             </ul>
-            {info.imageUrl && info.lpgUrl && (
-              <a
-                href={info.lpgUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-semibold underline"
-                style={{ color: "#d598aa" }}
-              >
-                {seeMore}
-              </a>
-            )}
           </div>
         </div>
       </div>
