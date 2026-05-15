@@ -2,16 +2,18 @@
 
 import { formatCHF } from "@/lib/utils";
 import { MIN_ORDER, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
+import { T } from "@/lib/i18n";
 
 interface Props {
   subtotal: number;
   onSubmit: () => void;
+  t: T;
 }
 
-export default function OrderBar({ subtotal, onSubmit }: Props) {
+export default function OrderBar({ subtotal, onSubmit, t }: Props) {
   const shipping = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
-  const belowMin = subtotal > 0 && subtotal < MIN_ORDER;
+  const missing = MIN_ORDER - subtotal;
   const canSubmit = subtotal >= MIN_ORDER;
 
   return (
@@ -20,36 +22,25 @@ export default function OrderBar({ subtotal, onSubmit }: Props) {
       style={{ backgroundColor: "white", borderTop: "1px solid #ded5d1" }}
     >
       <div className="max-w-lg mx-auto px-4 py-3">
-        {belowMin && (
-          <p className="text-xs text-center mb-2" style={{ color: "#bf7585" }}>
-            Minimum de commande : {formatCHF(MIN_ORDER)} (encore {formatCHF(MIN_ORDER - subtotal)})
-          </p>
-        )}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex flex-col gap-0.5">
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="space-y-1">
             <div className="flex items-center gap-3 text-sm">
-              <span style={{ color: "#bba8a1" }}>Sous-total</span>
+              <span className="w-20" style={{ color: "#bba8a1" }}>{t.sousTotal}</span>
               <span className="font-semibold">{formatCHF(subtotal)}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <span style={{ color: "#bba8a1" }}>Port</span>
+              <span className="w-20" style={{ color: "#bba8a1" }}>{t.port}</span>
               <span className="font-semibold">
-                {subtotal === 0
-                  ? "—"
-                  : shipping === 0
-                  ? "Offert ✓"
-                  : formatCHF(SHIPPING_COST)}
+                {subtotal === 0 ? "—" : shipping === 0 ? t.portOffert : formatCHF(SHIPPING_COST)}
               </span>
             </div>
             {subtotal > 0 && subtotal < SHIPPING_THRESHOLD && (
-              <p className="text-[10px]" style={{ color: "#bba8a1" }}>
-                Port offert dès {formatCHF(SHIPPING_THRESHOLD)}
-              </p>
+              <p className="text-[10px]" style={{ color: "#bba8a1" }}>{t.portOffertDes}</p>
             )}
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-wide" style={{ color: "#bba8a1" }}>
-              Total
+              {t.total}
             </p>
             <p className="text-xl font-bold" style={{ color: "#d598aa" }}>
               {formatCHF(total)}
@@ -59,17 +50,17 @@ export default function OrderBar({ subtotal, onSubmit }: Props) {
         <button
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity"
+          className="w-full py-3.5 rounded-xl text-sm font-semibold text-white transition-all"
           style={{
             backgroundColor: canSubmit ? "#d598aa" : "#ded5d1",
             cursor: canSubmit ? "pointer" : "not-allowed",
           }}
         >
           {subtotal === 0
-            ? "Commencer la sélection"
+            ? t.btnStart
             : !canSubmit
-            ? `Minimum non atteint (${formatCHF(MIN_ORDER)})`
-            : "Envoyer la commande →"}
+            ? t.btnMinNotReached(formatCHF(missing))
+            : t.btnSend}
         </button>
       </div>
     </div>

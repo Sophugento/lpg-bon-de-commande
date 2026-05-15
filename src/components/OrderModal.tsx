@@ -3,17 +3,27 @@
 import { useState } from "react";
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
 import { calcPromo, formatCHF } from "@/lib/utils";
+import { T, Lang } from "@/lib/i18n";
+
+interface Address {
+  company: string;
+  address: string;
+  postalCode: string;
+  city: string;
+}
 
 interface ContactInfo {
   firstName: string;
   lastName: string;
-  studio: string;
+  company: string;
   address: string;
   postalCode: string;
   city: string;
   email: string;
   phone: string;
   notes: string;
+  sameDelivery: boolean;
+  delivery: Address;
 }
 
 interface Props {
@@ -23,7 +33,11 @@ interface Props {
   quantities: Record<string, number>;
   offerQtys: Record<string, number>;
   subtotal: number;
+  t: T;
+  lang: Lang;
 }
+
+const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
 
 export default function OrderModal({
   onClose,
@@ -32,17 +46,21 @@ export default function OrderModal({
   quantities,
   offerQtys,
   subtotal,
+  t,
+  lang,
 }: Props) {
-  const [contact, setContact] = useState<ContactInfo>({
+  const [c, setC] = useState<ContactInfo>({
     firstName: "",
     lastName: "",
-    studio: "",
+    company: "",
     address: "",
     postalCode: "",
     city: "",
     email: "",
     phone: "",
     notes: "",
+    sameDelivery: true,
+    delivery: { ...EMPTY_DELIVERY },
   });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -53,17 +71,26 @@ export default function OrderModal({
   const selectedProducts = products.filter((p) => (quantities[p.ref] || 0) > 0);
   const selectedOffers = offers.filter((o) => (offerQtys[o.id] || 0) > 0);
 
-  function update(field: keyof ContactInfo, val: string) {
-    setContact((c) => ({ ...c, [field]: val }));
+  function upd<K extends keyof ContactInfo>(field: K, val: ContactInfo[K]) {
+    setC((prev) => ({ ...prev, [field]: val }));
   }
 
+  function updDelivery<K extends keyof Address>(field: K, val: string) {
+    setC((prev) => ({ ...prev, delivery: { ...prev.delivery, [field]: val } }));
+  }
+
+  const deliveryValid =
+    c.sameDelivery ||
+    (c.delivery.address.trim() && c.delivery.postalCode.trim() && c.delivery.city.trim());
+
   const isValid =
-    contact.firstName.trim() &&
-    contact.lastName.trim() &&
-    contact.email.trim() &&
-    contact.address.trim() &&
-    contact.postalCode.trim() &&
-    contact.city.trim();
+    c.firstName.trim() &&
+    c.lastName.trim() &&
+    c.email.trim() &&
+    c.address.trim() &&
+    c.postalCode.trim() &&
+    c.city.trim() &&
+    deliveryValid;
 
   async function handleSubmit() {
     if (!isValid) return;
@@ -72,7 +99,7 @@ export default function OrderModal({
     const orderLines = [
       ...selectedOffers.map((o) => ({
         ref: o.id,
-        name: o.nameFr,
+        name: lang === "de" ? o.nameDe : o.nameFr,
         type: "offre",
         size: "",
         qty: offerQtys[o.id],
@@ -85,7 +112,7 @@ export default function OrderModal({
         const { paid, free } = calcPromo(qty);
         return {
           ref: p.ref,
-          name: p.nameFr,
+          name: lang === "de" ? p.nameDe : p.nameFr,
           type: p.type,
           size: p.size,
           qty,
@@ -96,11 +123,23 @@ export default function OrderModal({
       }),
     ];
 
+    const deliveryAddress = c.sameDelivery
+      ? { company: c.company, address: c.address, postalCode: c.postalCode, city: c.city }
+      : c.delivery;
+
     try {
       const res = await fetch("/api/send-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact, orderLines, subtotal, shipping, total }),
+        body: JSON.stringify({
+          contact: c,
+          deliveryAddress,
+          orderLines,
+          subtotal,
+          shipping,
+          total,
+          lang,
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
       setStatus("success");
@@ -113,19 +152,23 @@ export default function OrderModal({
   if (status === "success") {
     return (
       <ModalShell onClose={onClose}>
-        <div className="text-center py-8 px-6">
-          <div className="text-5xl mb-4">✓</div>
-          <h2 className="text-xl font-semibold mb-2">Commande envoyée !</h2>
+        <div className="text-center py-12 px-6">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4"
+            style={{ backgroundColor: "#d598aa" }}
+          >
+            ✓
+          </div>
+          <h2 className="text-xl font-bold mb-2">{t.successTitle}</h2>
           <p className="text-sm" style={{ color: "#bba8a1" }}>
-            Votre commande a été transmise à LPG Switzerland. Vous recevrez une confirmation par
-            email.
+            {t.successMsg}
           </p>
           <button
             onClick={onClose}
-            className="mt-6 px-6 py-2 rounded-xl text-white text-sm font-semibold"
+            className="mt-6 px-8 py-3 rounded-xl text-white text-sm font-semibold"
             style={{ backgroundColor: "#d598aa" }}
           >
-            Fermer
+            {t.btnClose}
           </button>
         </div>
       </ModalShell>
@@ -134,40 +177,99 @@ export default function OrderModal({
 
   return (
     <ModalShell onClose={onClose}>
-      <div className="flex flex-col h-full">
-        <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: "#ded5d1" }}>
-          <h2 className="text-lg font-semibold">Finaliser la commande</h2>
+      <div className="flex flex-col" style={{ height: "calc(100dvh - 48px)" }}>
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3 border-b shrink-0" style={{ borderColor: "#ded5d1" }}>
+          <h2 className="text-lg font-bold">{t.modalTitle}</h2>
           <p className="text-xs mt-0.5" style={{ color: "#bba8a1" }}>
-            Vos coordonnées
+            {t.coordTitle}
           </p>
         </div>
 
+        {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          {/* Coordonnées */}
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Prénom *" value={contact.firstName} onChange={(v) => update("firstName", v)} />
-            <Field label="Nom *" value={contact.lastName} onChange={(v) => update("lastName", v)} />
+            <Field label={t.firstName} value={c.firstName} onChange={(v) => upd("firstName", v)} />
+            <Field label={t.lastName} value={c.lastName} onChange={(v) => upd("lastName", v)} />
           </div>
-          <Field label="Studio / Cabinet" value={contact.studio} onChange={(v) => update("studio", v)} />
-          <Field label="Adresse *" value={contact.address} onChange={(v) => update("address", v)} />
+          <Field label={t.company} value={c.company} onChange={(v) => upd("company", v)} />
+          <Field label={t.address} value={c.address} onChange={(v) => upd("address", v)} />
           <div className="grid grid-cols-3 gap-3">
-            <Field label="NPA *" value={contact.postalCode} onChange={(v) => update("postalCode", v)} />
+            <Field label={t.postalCode} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
             <div className="col-span-2">
-              <Field label="Ville *" value={contact.city} onChange={(v) => update("city", v)} />
+              <Field label={t.city} value={c.city} onChange={(v) => upd("city", v)} />
             </div>
           </div>
-          <Field label="Email *" type="email" value={contact.email} onChange={(v) => update("email", v)} />
-          <Field label="Téléphone" type="tel" value={contact.phone} onChange={(v) => update("phone", v)} />
+          <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
+          <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
+
+          {/* Adresse livraison */}
+          <div
+            className="rounded-xl p-3"
+            style={{ backgroundColor: "#f0cad620", border: "1px solid #f0cad6" }}
+          >
+            <p className="text-xs font-semibold mb-2" style={{ color: "#bf7585" }}>
+              {t.deliveryQuestion}
+            </p>
+            <div className="flex gap-3">
+              <ToggleBtn
+                active={c.sameDelivery}
+                onClick={() => upd("sameDelivery", true)}
+                label={t.deliveryYes}
+              />
+              <ToggleBtn
+                active={!c.sameDelivery}
+                onClick={() => upd("sameDelivery", false)}
+                label={t.deliveryNo}
+              />
+            </div>
+          </div>
+
+          {!c.sameDelivery && (
+            <div className="space-y-3 pt-1">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#bba8a1" }}>
+                {t.deliveryTitle}
+              </p>
+              <Field
+                label={t.deliveryCompany}
+                value={c.delivery.company}
+                onChange={(v) => updDelivery("company", v)}
+              />
+              <Field
+                label={t.deliveryAddress}
+                value={c.delivery.address}
+                onChange={(v) => updDelivery("address", v)}
+              />
+              <div className="grid grid-cols-3 gap-3">
+                <Field
+                  label={t.deliveryPostalCode}
+                  value={c.delivery.postalCode}
+                  onChange={(v) => updDelivery("postalCode", v)}
+                />
+                <div className="col-span-2">
+                  <Field
+                    label={t.deliveryCity}
+                    value={c.delivery.city}
+                    onChange={(v) => updDelivery("city", v)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Récapitulatif */}
-          <div className="mt-4 pt-4 border-t" style={{ borderColor: "#ded5d1" }}>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "#bba8a1" }}>
-              Récapitulatif
+          <div className="pt-4 border-t" style={{ borderColor: "#ded5d1" }}>
+            <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#bba8a1" }}>
+              {t.recap}
             </p>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {selectedOffers.map((o) => (
                 <div key={o.id} className="flex justify-between text-xs">
-                  <span className="flex-1 truncate pr-2">{o.nameFr} ×{offerQtys[o.id]}</span>
-                  <span className="font-medium">{formatCHF(offerQtys[o.id] * o.price)}</span>
+                  <span className="flex-1 truncate pr-2">
+                    {lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}
+                  </span>
+                  <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
                 </div>
               ))}
               {selectedProducts.map((p) => {
@@ -176,57 +278,56 @@ export default function OrderModal({
                 return (
                   <div key={p.ref} className="flex justify-between text-xs">
                     <span className="flex-1 truncate pr-2">
-                      {p.nameFr} ×{qty}
-                      {free > 0 && (
-                        <span style={{ color: "#d598aa" }}> (+{free})</span>
-                      )}
+                      {lang === "de" ? p.nameDe : p.nameFr}
+                      {p.size ? ` (${p.size})` : ""} ×{qty}
+                      {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
                     </span>
-                    <span className="font-medium">{formatCHF(paid * p.price)}</span>
+                    <span className="font-semibold">{formatCHF(paid * p.price)}</span>
                   </div>
                 );
               })}
             </div>
             <div className="mt-3 pt-3 border-t space-y-1" style={{ borderColor: "#ded5d1" }}>
               <div className="flex justify-between text-xs">
-                <span style={{ color: "#bba8a1" }}>Sous-total</span>
+                <span style={{ color: "#bba8a1" }}>{t.sousTotal}</span>
                 <span>{formatCHF(subtotal)}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span style={{ color: "#bba8a1" }}>Frais de port</span>
-                <span>{shipping === 0 ? "Offerts" : formatCHF(SHIPPING_COST)}</span>
+                <span style={{ color: "#bba8a1" }}>{t.shippingLabel}</span>
+                <span>{shipping === 0 ? t.shippingFree : formatCHF(SHIPPING_COST)}</span>
               </div>
-              <div className="flex justify-between text-sm font-bold mt-1">
-                <span>Total</span>
+              <div className="flex justify-between text-sm font-bold pt-1">
+                <span>{t.total}</span>
                 <span style={{ color: "#d598aa" }}>{formatCHF(total)}</span>
               </div>
             </div>
           </div>
 
           <Field
-            label="Remarques / Notes"
-            value={contact.notes}
-            onChange={(v) => update("notes", v)}
+            label={t.notes}
+            value={c.notes}
+            onChange={(v) => upd("notes", v)}
             multiline
           />
         </div>
 
         {status === "error" && (
-          <p className="px-5 py-2 text-xs text-center" style={{ color: "#bf7585" }}>
-            Erreur : {errorMsg}
+          <p className="px-5 py-2 text-xs text-center shrink-0" style={{ color: "#bf7585" }}>
+            {t.errorPrefix}{errorMsg}
           </p>
         )}
 
-        <div className="px-5 py-4 border-t" style={{ borderColor: "#ded5d1" }}>
+        <div className="px-5 py-4 border-t shrink-0" style={{ borderColor: "#ded5d1" }}>
           <button
             onClick={handleSubmit}
             disabled={!isValid || status === "sending"}
-            className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity"
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white"
             style={{
               backgroundColor: isValid && status === "idle" ? "#d598aa" : "#ded5d1",
               cursor: isValid && status === "idle" ? "pointer" : "not-allowed",
             }}
           >
-            {status === "sending" ? "Envoi en cours…" : "Confirmer la commande"}
+            {status === "sending" ? t.btnSending : t.btnConfirm}
           </button>
         </div>
       </div>
@@ -235,57 +336,51 @@ export default function OrderModal({
 }
 
 function Field({
-  label,
-  value,
-  onChange,
-  type = "text",
-  multiline = false,
+  label, value, onChange, type = "text", multiline = false,
 }: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  multiline?: boolean;
+  label: string; value: string; onChange: (v: string) => void; type?: string; multiline?: boolean;
 }) {
-  const cls =
-    "w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#d598aa] transition-colors";
-  const style = { borderColor: "#ded5d1", backgroundColor: "white" };
+  const cls = "w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-[#d598aa] transition-colors bg-white";
+  const style = { borderColor: "#ded5d1" };
   return (
     <div>
-      <label className="text-xs font-medium block mb-1" style={{ color: "#bba8a1" }}>
-        {label}
-      </label>
+      <label className="text-xs font-medium block mb-1" style={{ color: "#bba8a1" }}>{label}</label>
       {multiline ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={2}
-          className={cls}
-          style={style}
-        />
+        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} className={cls} style={style} />
       ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={cls}
-          style={style}
-        />
+        <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cls} style={style} />
       )}
     </div>
   );
 }
 
+function ToggleBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex-1 py-2 rounded-lg text-xs font-semibold border transition-all"
+      style={{
+        borderColor: active ? "#d598aa" : "#ded5d1",
+        backgroundColor: active ? "#d598aa" : "white",
+        color: active ? "white" : "#bba8a1",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 function ModalShell({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: "rgba(45,32,32,0.4)" }}>
+    <div className="fixed inset-0 z-50" style={{ backgroundColor: "rgba(45,32,32,0.5)" }}>
       <div
-        className="flex-1 mt-12 rounded-t-3xl flex flex-col overflow-hidden"
-        style={{ backgroundColor: "#f7f4f3", maxHeight: "calc(100vh - 48px)" }}
+        className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
+        style={{ top: "48px", backgroundColor: "#f7f4f3" }}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white text-xl font-bold"
+          className="absolute top-3 right-4 z-10 text-2xl font-light"
+          style={{ color: "#bba8a1" }}
           aria-label="Fermer"
         >
           ×
