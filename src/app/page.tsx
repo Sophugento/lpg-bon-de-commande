@@ -1,101 +1,137 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useMemo } from "react";
+import { PRODUCTS, OFFERS, CATEGORIES } from "@/data/products";
+import { calcPromo } from "@/lib/utils";
+import CategorySection from "@/components/CategorySection";
+import OfferRow from "@/components/OfferRow";
+import OrderBar from "@/components/OrderBar";
+import OrderModal from "@/components/OrderModal";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [offerQtys, setOfferQtys] = useState<Record<string, number>>({});
+  const [modalOpen, setModalOpen] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  function updateQty(ref: string, qty: number) {
+    setQuantities((q) => ({ ...q, [ref]: qty }));
+  }
+
+  function updateOfferQty(id: string, qty: number) {
+    setOfferQtys((q) => ({ ...q, [id]: qty }));
+  }
+
+  const subtotal = useMemo(() => {
+    const productTotal = PRODUCTS.reduce((sum, p) => {
+      const qty = quantities[p.ref] || 0;
+      if (qty === 0) return sum;
+      const { paid } = calcPromo(qty);
+      return sum + paid * p.price;
+    }, 0);
+    const offerTotal = OFFERS.reduce((sum, o) => {
+      return sum + (offerQtys[o.id] || 0) * o.price;
+    }, 0);
+    return Math.round((productTotal + offerTotal) * 100) / 100;
+  }, [quantities, offerQtys]);
+
+  const categorizedProducts = useMemo(() => {
+    return CATEGORIES.reduce(
+      (acc, cat) => {
+        acc[cat] = PRODUCTS.filter((p) => p.category === cat);
+        return acc;
+      },
+      {} as Record<string, typeof PRODUCTS>
+    );
+  }, []);
+
+  return (
+    <main className="min-h-screen pb-36">
+      {/* Header */}
+      <header
+        className="sticky top-0 z-40 px-4 py-3 flex items-center gap-3 shadow-sm"
+        style={{ backgroundColor: "white", borderBottom: "1px solid #ded5d1" }}
+      >
+        <div>
+          <p className="text-[10px] uppercase tracking-widest" style={{ color: "#d598aa" }}>
+            LPG Switzerland
+          </p>
+          <h1 className="text-base font-bold leading-tight" style={{ color: "#2d2020" }}>
+            Bon de commande 2026
+          </h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </header>
+
+      {/* Règles */}
+      <div
+        className="mx-4 mt-4 mb-3 rounded-xl p-3 text-xs space-y-1"
+        style={{ backgroundColor: "#f0cad620", border: "1px solid #f0cad6" }}
+      >
+        <p className="font-semibold" style={{ color: "#bf7585" }}>
+          Conditions de commande
+        </p>
+        <p style={{ color: "#8a5565" }}>
+          • Minimum de commande : <strong>250 CHF</strong> netto
+        </p>
+        <p style={{ color: "#8a5565" }}>
+          • Frais de port : <strong>20 CHF</strong> — offerts dès 400 CHF netto
+        </p>
+        <p style={{ color: "#8a5565" }}>
+          • Produits revente : <strong>6 achetés = 1 offert</strong> · <strong>10 = +2 offerts</strong>
+        </p>
+        <p style={{ color: "#8a5565" }}>
+          • Min. <strong>3 pièces</strong> du même produit (revente)
+        </p>
+      </div>
+
+      <div className="px-4 space-y-1">
+        {/* Offres spéciales */}
+        <div className="mb-3 rounded-2xl overflow-hidden shadow-sm border" style={{ borderColor: "#d598aa40" }}>
+          <div
+            className="px-4 py-3.5 flex items-center gap-2"
+            style={{ backgroundColor: "#d598aa15" }}
+          >
+            <span className="font-semibold text-sm tracking-wide uppercase" style={{ color: "#d598aa" }}>
+              🎁 Offres Spéciales
+            </span>
+          </div>
+          <div className="bg-white/50">
+            {OFFERS.map((offer) => (
+              <OfferRow
+                key={offer.id}
+                offer={offer}
+                qty={offerQtys[offer.id] || 0}
+                onChange={updateOfferQty}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Catégories */}
+        {CATEGORIES.map((cat) => (
+          <CategorySection
+            key={cat}
+            category={cat}
+            products={categorizedProducts[cat]}
+            quantities={quantities}
+            onChange={updateQty}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        ))}
+      </div>
+
+      {/* Barre de commande */}
+      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} />
+
+      {/* Modal confirmation */}
+      {modalOpen && (
+        <OrderModal
+          onClose={() => setModalOpen(false)}
+          products={PRODUCTS}
+          offers={OFFERS}
+          quantities={quantities}
+          offerQtys={offerQtys}
+          subtotal={subtotal}
+        />
+      )}
+    </main>
   );
 }

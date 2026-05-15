@@ -3,25 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --lpg-rose: #d598aa;
+  --lpg-rose-light: #e8c0cc;
+  --lpg-beige: #f7f4f3;
+  --lpg-border: #ded5d1;
+  --lpg-text-secondary: #bba8a1;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--lpg-beige);
+  color: #2d2020;
+  -webkit-font-smoothing: antialiased;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .text-lpg-rose { color: var(--lpg-rose); }
+  .text-lpg-secondary { color: var(--lpg-text-secondary); }
+  .bg-lpg-beige { background-color: var(--lpg-beige); }
+  .bg-lpg-rose { background-color: var(--lpg-rose); }
+  .border-lpg { border-color: var(--lpg-border); }
 }
