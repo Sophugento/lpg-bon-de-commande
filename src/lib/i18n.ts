@@ -91,7 +91,7 @@ export const TRANSLATIONS = {
     btnSending: "Envoi en cours…",
     successTitle: "Commande envoyée !",
     successMsg:
-      "Votre commande a été transmise à LPG Switzerland. Vous recevrez une confirmation par e-mail.",
+      "Merci pour votre commande. Notre équipe la prend en charge et vous recontactera très prochainement.",
     btnClose: "Fermer",
     errorPrefix: "Erreur : ",
   },
@@ -176,7 +176,7 @@ export const TRANSLATIONS = {
     btnSending: "Wird gesendet…",
     successTitle: "Bestellung gesendet!",
     successMsg:
-      "Ihre Bestellung wurde an LPG Switzerland übermittelt. Sie erhalten eine Bestätigung per E-Mail.",
+      "Vielen Dank für Ihre Bestellung. Unser Team kümmert sich darum und meldet sich in Kürze bei Ihnen.",
     btnClose: "Schliessen",
     errorPrefix: "Fehler: ",
   },
