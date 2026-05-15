@@ -47,7 +47,7 @@ export const TRANSLATIONS = {
     } as Record<string, string>,
 
     // Prix
-    htNote: "Tous les prix sont HT",
+    htNote: "Tous les prix sont netto (HT)",
     prixVente: "Prix vente :",
 
     // Promo
@@ -135,7 +135,7 @@ export const TRANSLATIONS = {
       "Consommables": "Material-Bedarf",
     } as Record<string, string>,
 
-    htNote: "Alle Preise sind exkl. MwSt.",
+    htNote: "Alle Preise sind Nettopreise (exkl. MwSt.)",
     prixVente: "Verkaufspreis:",
 
     promoLabel: (n: number, code: string) => `🎁 +${n} geschenkt (${code})`,

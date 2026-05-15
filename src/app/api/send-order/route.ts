@@ -134,7 +134,10 @@ export async function POST(req: NextRequest) {
   const toEmail = process.env.ORDER_EMAIL || "commandes@lpg.ch";
 
   if (!apiKey) {
-    return NextResponse.json({ error: "RESEND_API_KEY non configurée" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Clé Resend manquante — vérifier RESEND_API_KEY dans Vercel > Settings > Environment Variables" },
+      { status: 500 }
+    );
   }
 
   const html = buildHtml(payload);
@@ -143,25 +146,34 @@ export async function POST(req: NextRequest) {
       ? `Bestellung — ${contact.firstName} ${contact.lastName}${contact.company ? " — " + contact.company : ""}`
       : `Bon de commande — ${contact.firstName} ${contact.lastName}${contact.company ? " — " + contact.company : ""}`;
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "LPG Switzerland <onboarding@resend.dev>",
-      to: [toEmail],
-      reply_to: contact.email,
-      cc: [contact.email],
-      subject,
-      html,
-    }),
-  });
+  let resendRes: Response;
+  try {
+    resendRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "LPG Switzerland <onboarding@resend.dev>",
+        to: [toEmail],
+        reply_to: contact.email,
+        cc: [contact.email],
+        subject,
+        html,
+      }),
+    });
+  } catch (e) {
+    return NextResponse.json({ error: `Réseau : ${e}` }, { status: 502 });
+  }
 
-  if (!res.ok) {
-    const err = await res.text();
-    return NextResponse.json({ error: err }, { status: 500 });
+  if (!resendRes.ok) {
+    const body = await resendRes.json().catch(() => ({}));
+    const msg = (body as { message?: string }).message ?? resendRes.statusText;
+    return NextResponse.json(
+      { error: `Resend (${resendRes.status}) : ${msg}` },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ ok: true });

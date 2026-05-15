@@ -24,7 +24,7 @@ export default function OrderBar({ subtotal, onSubmit, t }: Props) {
       <div className="max-w-lg mx-auto px-4 py-3">
         <div className="mb-2.5 space-y-1.5">
           <div className="flex justify-between items-center text-sm">
-            <span style={{ color: "#bba8a1" }}>{t.sousTotal} <span className="text-[10px]">(HT)</span></span>
+            <span style={{ color: "#bba8a1" }}>{t.sousTotal} <span className="text-[10px]">(netto)</span></span>
             <span className="font-semibold">{formatCHF(subtotal)}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
