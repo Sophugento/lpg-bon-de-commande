@@ -19,57 +19,52 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end"
-      style={{ backgroundColor: "rgba(45,32,32,0.45)" }}
+      className="fixed inset-0 z-50 flex items-center justify-center px-5"
+      style={{ backgroundColor: "rgba(45,32,32,0.55)" }}
       onClick={onClose}
     >
       <div
-        className="w-full rounded-t-3xl overflow-hidden relative"
-        style={{ backgroundColor: "white" }}
+        className="w-full rounded-2xl overflow-hidden shadow-2xl"
+        style={{ backgroundColor: "white", maxWidth: "400px", maxHeight: "80vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Bouton fermer */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-4 w-7 h-7 flex items-center justify-center rounded-full text-lg font-light z-10"
-          style={{ color: "#bba8a1", backgroundColor: "#f0ebe9" }}
-        >
-          ×
-        </button>
+        {/* En-tête */}
+        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid #f0ebe9" }}>
+          <h2 className="text-sm font-bold uppercase tracking-wide" style={{ color: "#2d2020" }}>
+            {name}
+          </h2>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-full text-base font-light shrink-0 ml-2"
+            style={{ backgroundColor: "#f0ebe9", color: "#bba8a1" }}
+          >
+            ×
+          </button>
+        </div>
 
-        {/* Layout : image gauche + texte droite */}
-        <div className="flex" style={{ minHeight: 0 }}>
+        {/* Corps scrollable */}
+        <div className="overflow-y-auto" style={{ maxHeight: "calc(80vh - 52px)" }}>
           {/* Image */}
           {info.imageUrl && (
-            <div
-              className="shrink-0 flex items-center justify-center"
-              style={{ width: "140px", backgroundColor: "#f7f4f3" }}
-            >
+            <div className="flex items-center justify-center py-4" style={{ backgroundColor: "#faf9f8" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={info.imageUrl}
                 alt={name}
-                className="w-full object-contain p-3"
-                style={{ maxHeight: "200px" }}
+                style={{ height: "160px", objectFit: "contain" }}
               />
             </div>
           )}
 
-          {/* Contenu texte */}
-          <div
-            className="flex-1 px-4 py-4 overflow-y-auto"
-            style={{ maxHeight: "65vh" }}
-          >
-            <h2 className="text-sm font-bold uppercase tracking-wide mb-1.5 pr-6" style={{ color: "#2d2020" }}>
-              {name}
-            </h2>
-            <p className="text-xs mb-3 leading-relaxed" style={{ color: "#6b5050" }}>
+          {/* Texte */}
+          <div className="px-4 py-4">
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "#6b5050" }}>
               {description}
             </p>
-            <ul className="space-y-1.5 mb-4">
+            <ul className="space-y-2 mb-4">
               {benefits.map((b, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-xs" style={{ color: "#2d2020" }}>
-                  <span className="shrink-0" style={{ color: "#d598aa", lineHeight: "1.5" }}>✓</span>
+                <li key={i} className="flex items-start gap-2 text-sm" style={{ color: "#2d2020" }}>
+                  <span className="shrink-0 font-bold" style={{ color: "#d598aa" }}>✓</span>
                   <span>{b}</span>
                 </li>
               ))}
@@ -79,7 +74,7 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
                 href={info.lpgUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] font-semibold underline"
+                className="text-xs font-semibold underline"
                 style={{ color: "#d598aa" }}
               >
                 {seeMore}
