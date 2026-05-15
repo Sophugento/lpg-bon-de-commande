@@ -341,8 +341,6 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Entspannender Kräuteraufguss für erholsamen Schlaf und Stressreduktion.",
     benefits: ["Favorise l'endormissement", "Réduit le stress et l'anxiété", "Sommeil réparateur"],
     benefitsDe: ["Fördert das Einschlafen", "Reduziert Stress und Angst", "Erholsamer Schlaf"],
-    imageUrl: BASE + "fiches-produits-complexe-stress-sommeil_4.jpg",
-    lpgUrl: BASE_URL + "nutricosmetics",
   },
   "SOS PETITS ÉCARTS — ÉDITION LIMITÉE": {
     description: "Sticks minceur express pour les moments d'écarts alimentaires.",

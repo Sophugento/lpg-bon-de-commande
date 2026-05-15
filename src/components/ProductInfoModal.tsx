@@ -19,7 +19,7 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-5"
+      className="fixed inset-0 z-[200] flex items-center justify-center px-5"
       style={{ backgroundColor: "rgba(45,32,32,0.55)" }}
       onClick={onClose}
     >
@@ -69,7 +69,7 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
                 </li>
               ))}
             </ul>
-            {info.lpgUrl && (
+            {info.imageUrl && info.lpgUrl && (
               <a
                 href={info.lpgUrl}
                 target="_blank"
