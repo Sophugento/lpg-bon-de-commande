@@ -11,6 +11,7 @@ const BASE = "https://www.lpg-group.com/media/wysiwyg/";
 const BASE_URL = "https://www.lpg-group.com/fr/expertise-esthetique/cosmetiques/";
 
 export const PRODUCT_INFO: Record<string, ProductInfo> = {
+  // ── CORPS ──────────────────────────────────────────────────────────────
   "GEL LIPORÉDUCTEUR": {
     description: "Reshape et sculpte la silhouette pour des contours affinés.",
     descriptionDe: "Formt und modelliert die Silhouette für schlankere Konturen.",
@@ -67,11 +68,14 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     imageUrl: BASE + "Huile_Experte_Vergeture-LPG_3.jpg",
     lpgUrl: BASE_URL + "cosmetiques-corps/huile-experte-vergetures",
   },
+
+  // ── VISAGE ─────────────────────────────────────────────────────────────
   "BAUME DÉMAQUILLANT": {
     description: "Baume fondant qui démaquille en douceur tout en nourrissant la peau.",
     descriptionDe: "Schmelzender Balsam, der sanft reinigt und die Haut nährt.",
     benefits: ["Démaquillage doux et efficace", "Nourrit et apaise la peau", "Convient aux peaux sensibles"],
     benefitsDe: ["Sanfte und effektive Reinigung", "Nährt und beruhigt die Haut", "Für empfindliche Haut geeignet"],
+    imageUrl: BASE + "LPG_-_PACK_-_BAUME_DEMAQUILLANT_2_6.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/nettoyer-preparer/baume-demaquillant",
   },
   "EAU MICELLAIRE PRÉPARATRICE": {
@@ -79,6 +83,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Vorbereitendes Mizellenwasser, das die Haut reinigt und vor der Pflege vorbereitet.",
     benefits: ["Purifie sans agresser", "Prépare la peau aux soins", "Formule douce et efficace"],
     benefitsDe: ["Reinigt ohne zu reizen", "Bereitet die Haut auf Pflege vor", "Sanfte und wirksame Formel"],
+    imageUrl: BASE + "LPG_-_PACK_-_EAU_MICELLAIRE_4.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/nettoyer-preparer",
   },
   "SOIN NUIT RÉGÉNÉRANT SUBLIMATEUR": {
@@ -86,6 +91,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Nachtpflege, die die Haut während des Schlafs regeneriert und verschönert.",
     benefits: ["Régénération cellulaire nocturne", "Teint lumineux au réveil", "Peau lissée et unifiée"],
     benefitsDe: ["Nächtliche Zellregeneration", "Strahlender Teint beim Aufwachen", "Geglättete und ebenmäßige Haut"],
+    imageUrl: BASE + "fiches-produits-soin-nuit-regenerant-4.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/cremes-jour-nuit",
   },
   "SOIN NUIT GLYCOLIQUE RESURFAÇANT": {
@@ -93,6 +99,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Mildert Flecken, verschönert den Teint und glättet die Haut dank Glykolsäure.",
     benefits: ["Estompe les taches brunes", "Teint lumineux et unifié", "Peau visiblement lissée"],
     benefitsDe: ["Mildert Pigmentflecken", "Strahlender und ebenmäßiger Teint", "Sichtbar geglättete Haut"],
+    imageUrl: BASE + "fiches-produits-soin-nuit-glycolique.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/cremes-jour-nuit",
   },
   "SÉRUM LIFT RAFFERMISSANT": {
@@ -100,6 +107,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Erhält den Glanz und die Festigkeit der Haut für einen sichtbaren Lifting-Effekt.",
     benefits: ["Effet lift immédiat", "Raffermit et redensifie", "Préserve l'éclat naturel"],
     benefitsDe: ["Sofortiger Lifting-Effekt", "Strafft und verdichtet", "Erhält den natürlichen Glanz"],
+    imageUrl: BASE + "Serumlift-raffermissant-LPG.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/serums",
   },
   "SÉRUM ANTI-ÂGE RÉGÉNÉRATION CELLULAIRE": {
@@ -107,6 +115,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Korrigiert alle Anzeichen des Alterns durch Zellregeneration.",
     benefits: ["Régénération cellulaire profonde", "Corrige rides et taches", "Anti-âge global"],
     benefitsDe: ["Tiefe Zellregeneration", "Korrigiert Falten und Flecken", "Globale Anti-Aging-Wirkung"],
+    imageUrl: BASE + "SERUM_AARC.jpg",
     lpgUrl: BASE_URL + "cosmetiques-visage/serums",
   },
   "FLUIDE UV+ DÉFENSE CELLULAIRE": {
@@ -115,5 +124,115 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     benefits: ["SPF50+ UVA/UVB", "Protection lumière bleue", "Texture légère non grasse"],
     benefitsDe: ["LSF50+ UVA/UVB", "Schutz vor blauem Licht", "Leichte, nicht fettige Textur"],
     lpgUrl: BASE_URL + "cosmetiques-visage/protection-solaire",
+  },
+
+  // ── NUTRICOSMETICS ─────────────────────────────────────────────────────
+  "RÉDUCTEUR D'APPÉTIT": {
+    description: "Complément alimentaire pour réduire l'appétit et favoriser la perte de poids.",
+    descriptionDe: "Nahrungsergänzungsmittel zur Reduktion des Appetits und Unterstützung der Gewichtsabnahme.",
+    benefits: ["Réduit la sensation de faim", "Favorise la perte de poids", "Complément des séances LPG"],
+    benefitsDe: ["Reduziert das Hungergefühl", "Unterstützt die Gewichtsabnahme", "Ergänzt LPG-Behandlungen"],
+    imageUrl: BASE + "Reducteur-appetit-LPG.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "CONCENTRÉ DRAINANT": {
+    description: "Boisson drainante qui favorise l'élimination des toxines et réduit la rétention d'eau.",
+    descriptionDe: "Drainierungsgetränk, das die Entgiftung fördert und Wassereinlagerungen reduziert.",
+    benefits: ["Élimine les toxines", "Réduit la rétention d'eau", "Favorise le drainage lymphatique"],
+    benefitsDe: ["Entgiftet den Körper", "Reduziert Wassereinlagerungen", "Fördert den Lymphfluss"],
+    imageUrl: BASE + "concentre_drainant_LPG.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "STOP PEAU D'ORANGE": {
+    description: "Complément anti-cellulite qui agit sur les facteurs internes de la cellulite.",
+    descriptionDe: "Anti-Cellulite-Ergänzung, die auf interne Cellulite-Faktoren wirkt.",
+    benefits: ["Action anti-cellulite de l'intérieur", "Lisse la texture de la peau", "Optimise les résultats LPG"],
+    benefitsDe: ["Anti-Cellulite von innen", "Glättet die Hauttextur", "Optimiert LPG-Ergebnisse"],
+    imageUrl: BASE + "Stop-peau-d-orange-LPG_3.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "BOOSTER DE VITALITÉ": {
+    description: "Complément énergisant pour retrouver vitalité et tonus au quotidien.",
+    descriptionDe: "Energieergänzung für mehr Vitalität und Tonus im Alltag.",
+    benefits: ["Booste l'énergie naturellement", "Réduit la fatigue", "Soutient le métabolisme"],
+    benefitsDe: ["Steigert die Energie natürlich", "Reduziert Müdigkeit", "Unterstützt den Stoffwechsel"],
+    imageUrl: BASE + "BOOSTER_DE_VITALITE_14.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "ACIDE HYALURONIQUE": {
+    description: "Complément à l'acide hyaluronique pour hydrater et repulper la peau de l'intérieur.",
+    descriptionDe: "Hyaluronsäure-Ergänzung zur Hydratisierung und Auffüllung der Haut von innen.",
+    benefits: ["Hydrate en profondeur", "Repulpe la peau", "Action anti-rides de l'intérieur"],
+    benefitsDe: ["Tiefenwirksame Hydratisierung", "Füllt die Haut auf", "Anti-Falten-Wirkung von innen"],
+    imageUrl: BASE + "ACIDE_HYALURONIQUE_6.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "CONCENTRÉ BRÛLE-GRAISSES": {
+    description: "Complément minceur qui stimule la combustion des graisses et booste le métabolisme.",
+    descriptionDe: "Schlankheitsergänzung, die die Fettverbrennung stimuliert und den Stoffwechsel ankurbelt.",
+    benefits: ["Stimule la combustion des graisses", "Booste le métabolisme", "Soutient l'effort minceur"],
+    benefitsDe: ["Stimuliert die Fettverbrennung", "Kurbelt den Stoffwechsel an", "Unterstützt die Schlankheitsbemühungen"],
+    imageUrl: BASE + "concentre_brule_graisses_3.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "COLLAGÈNE": {
+    description: "Collagène marin en poudre pour préserver la jeunesse et l'élasticité de la peau.",
+    descriptionDe: "Marines Kollagenpulver zur Erhaltung der Jugendlichkeit und Elastizität der Haut.",
+    benefits: ["Préserve l'élasticité cutanée", "Réduit les rides", "Renforce les articulations"],
+    benefitsDe: ["Erhält die Hautelastizität", "Reduziert Falten", "Stärkt die Gelenke"],
+    imageUrl: BASE + "collagene_LPG.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "OMÉGA": {
+    description: "Complément riche en oméga 3, 6, 9 pour nourrir la peau et soutenir le système cardiovasculaire.",
+    descriptionDe: "Nahrungsergänzung reich an Omega 3, 6, 9 zur Hautpflege und Unterstützung des Herz-Kreislauf-Systems.",
+    benefits: ["Nourrit la peau de l'intérieur", "Soutient le système cardiovasculaire", "Equilibre le bilan lipidique"],
+    benefitsDe: ["Nährt die Haut von innen", "Unterstützt das Herz-Kreislauf-System", "Balanciert den Fettstoffwechsel"],
+    imageUrl: BASE + "OMEGA.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "THÉ BIO MINCEUR EXPRESS": {
+    description: "Infusion bio aux plantes sélectionnées pour favoriser la minceur et le drainage.",
+    descriptionDe: "Bio-Kräuteraufguss aus ausgewählten Pflanzen zur Unterstützung der Schlankheit und Drainage.",
+    benefits: ["Favorise le drainage naturel", "Action minceur progressive", "100% bio et naturel"],
+    benefitsDe: ["Fördert natürliche Drainage", "Schrittweise Schlankheitswirkung", "100% bio und natürlich"],
+    imageUrl: BASE + "THE_BIO_MINCEUR_4.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "TISANE STRESS SOMMEIL": {
+    description: "Infusion relaxante pour favoriser un sommeil de qualité et réduire le stress.",
+    descriptionDe: "Entspannender Kräuteraufguss für erholsamen Schlaf und Stressreduktion.",
+    benefits: ["Favorise l'endormissement", "Réduit le stress et l'anxiété", "Sommeil réparateur"],
+    benefitsDe: ["Fördert das Einschlafen", "Reduziert Stress und Angst", "Erholsamer Schlaf"],
+    imageUrl: BASE + "fiches-produits-complexe-stress-sommeil_4.jpg",
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "SOS PETITS ÉCARTS — ÉDITION LIMITÉE": {
+    description: "Sticks minceur express pour les moments d'écarts alimentaires.",
+    descriptionDe: "Express-Schlankheitssticks für kleine Ernährungssünden.",
+    benefits: ["Action express après les repas", "Réduit l'absorption des graisses et sucres", "Pratique en déplacement"],
+    benefitsDe: ["Express-Wirkung nach den Mahlzeiten", "Reduziert Fett- und Zuckeraufnahme", "Praktisch für unterwegs"],
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "THÉ BIO GLACÉ DÉTOX — ÉD. LIMITÉE": {
+    description: "Infusion glacée détoxifiante pour purifier l'organisme tout en se désaltérant.",
+    descriptionDe: "Entgiftender Eiskräuteraufguss zur Reinigung des Körpers.",
+    benefits: ["Détoxifie l'organisme", "Rafraîchissant et désaltérant", "100% bio"],
+    benefitsDe: ["Entgiftet den Körper", "Erfrischend und durstlöschend", "100% bio"],
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "THÉ BIO BIEN-ÊTRE — ÉD. LIMITÉE": {
+    description: "Infusion bio bien-être pour prendre soin de soi au quotidien.",
+    descriptionDe: "Bio-Wohlfühlaufguss für die tägliche Selbstfürsorge.",
+    benefits: ["Favorise le bien-être général", "Riche en antioxydants", "100% bio"],
+    benefitsDe: ["Fördert allgemeines Wohlbefinden", "Reich an Antioxidantien", "100% bio"],
+    lpgUrl: BASE_URL + "nutricosmetics",
+  },
+  "THÉ BIO MINCEUR VRAC — ÉD. LIMITÉE": {
+    description: "Grand format de l'infusion bio minceur pour une cure longue durée.",
+    descriptionDe: "Großformat des Bio-Schlankheitsaufgusses für eine Langzeitkur.",
+    benefits: ["Format économique", "Même formule que le sachet", "Idéal pour une cure complète"],
+    benefitsDe: ["Wirtschaftliches Format", "Gleiche Formel wie im Beutel", "Ideal für eine vollständige Kur"],
+    lpgUrl: BASE_URL + "nutricosmetics",
   },
 };

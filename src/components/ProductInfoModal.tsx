@@ -24,12 +24,12 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
       onClick={onClose}
     >
       <div
-        className="w-full rounded-2xl overflow-hidden shadow-2xl"
-        style={{ backgroundColor: "white", maxWidth: "400px", maxHeight: "80vh" }}
+        className="w-full rounded-2xl shadow-2xl flex flex-col"
+        style={{ backgroundColor: "white", maxWidth: "400px", maxHeight: "78vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête */}
-        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid #f0ebe9" }}>
+        {/* En-tête fixe */}
+        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: "1px solid #f0ebe9" }}>
           <h2 className="text-sm font-bold uppercase tracking-wide" style={{ color: "#2d2020" }}>
             {name}
           </h2>
@@ -43,10 +43,10 @@ export default function ProductInfoModal({ nameFr, nameDe, info, lang, onClose }
         </div>
 
         {/* Corps scrollable */}
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(80vh - 52px)" }}>
+        <div className="overflow-y-auto flex-1" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
           {/* Image */}
           {info.imageUrl && (
-            <div className="flex items-center justify-center py-4" style={{ backgroundColor: "#faf9f8" }}>
+            <div className="flex items-center justify-center py-4" style={{ backgroundColor: "white" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={info.imageUrl}
