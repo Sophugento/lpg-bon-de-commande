@@ -48,6 +48,7 @@ export const TRANSLATIONS = {
 
     // Prix
     htNote: "Tous les prix sont netto (HT)",
+    priceNote: "HT",
     prixVente: "Prix vente :",
 
     // Promo
@@ -56,10 +57,11 @@ export const TRANSLATIONS = {
 
     // Barre commande
     sousTotal: "Sous-total",
-    port: "Port",
+    port: "Frais de port",
     portOffert: "Offert ✓",
-    portOffertDes: "Port offert dès 400,00 CHF",
+    portOffertDes: "Frais de port offerts dès 400,00 CHF",
     total: "Total",
+    totalTTC: "Total TTC (TVA 8.1%)",
     btnStart: "Commencer la sélection",
     btnMinNotReached: (missing: string) => `Minimum non atteint (encore ${missing})`,
     btnSend: "Envoyer la commande →",
@@ -136,6 +138,7 @@ export const TRANSLATIONS = {
     } as Record<string, string>,
 
     htNote: "Alle Preise sind Nettopreise (exkl. MwSt.)",
+    priceNote: "netto",
     prixVente: "Verkaufspreis:",
 
     promoLabel: (n: number, code: string) => `🎁 +${n} geschenkt (${code})`,
@@ -146,6 +149,7 @@ export const TRANSLATIONS = {
     portOffert: "Gratis ✓",
     portOffertDes: "Portofrei ab 400,00 CHF",
     total: "Total",
+    totalTTC: "Total inkl. MwSt. (8.1%)",
     btnStart: "Auswahl beginnen",
     btnMinNotReached: (missing: string) => `Mindestbestellwert nicht erreicht (noch ${missing})`,
     btnSend: "Bestellung senden →",

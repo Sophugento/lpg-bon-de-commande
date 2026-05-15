@@ -13,6 +13,7 @@ interface Props {
 export default function OrderBar({ subtotal, onSubmit, t }: Props) {
   const shipping = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
+  const totalTTC = total * 1.081;
   const missing = MIN_ORDER - subtotal;
   const canSubmit = subtotal >= MIN_ORDER;
 
@@ -24,7 +25,7 @@ export default function OrderBar({ subtotal, onSubmit, t }: Props) {
       <div className="max-w-lg mx-auto px-4 py-3">
         <div className="mb-2.5 space-y-1.5">
           <div className="flex justify-between items-center text-sm">
-            <span style={{ color: "#bba8a1" }}>{t.sousTotal} <span className="text-[10px]">(netto)</span></span>
+            <span style={{ color: "#bba8a1" }}>{t.sousTotal} <span className="text-[10px]">({t.priceNote})</span></span>
             <span className="font-semibold">{formatCHF(subtotal)}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
@@ -40,6 +41,12 @@ export default function OrderBar({ subtotal, onSubmit, t }: Props) {
             <span className="text-sm font-bold uppercase tracking-wide" style={{ color: "#bba8a1" }}>{t.total}</span>
             <span className="text-xl font-bold" style={{ color: "#d598aa" }}>{formatCHF(total)}</span>
           </div>
+          {total > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-[10px]" style={{ color: "#bba8a1" }}>{t.totalTTC}</span>
+              <span className="text-[11px] font-semibold" style={{ color: "#bba8a1" }}>{formatCHF(totalTTC)}</span>
+            </div>
+          )}
         </div>
         <button
           onClick={onSubmit}
