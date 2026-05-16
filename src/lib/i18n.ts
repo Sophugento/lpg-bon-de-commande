@@ -10,7 +10,7 @@ export const TRANSLATIONS = {
     rulesTitle: "Conditions de commande",
     ruleMin: "Minimum de commande :",
     ruleShipping: "Frais de port :",
-    ruleShippingDetail: "— offerts dès 400 CHF netto",
+    ruleShippingDetail: "— offerts dès 400 CHF HT",
     rulePromo: "Produits revente : 6 achetés = 1 offert · 10 = +2 offerts",
     ruleMinQty: "Min. 3 pièces du même produit (revente)",
 
@@ -47,7 +47,7 @@ export const TRANSLATIONS = {
     } as Record<string, string>,
 
     // Prix
-    htNote: "Tous les prix sont netto (HT)",
+    htNote: "Tous les prix sont nets (HT)",
     priceNote: "HT",
     prixVente: "Prix vente :",
 

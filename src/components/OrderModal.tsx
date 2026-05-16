@@ -153,24 +153,75 @@ export default function OrderModal({
   if (status === "success") {
     return (
       <ModalShell onClose={onClose}>
-        <div className="text-center py-12 px-6">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4"
-            style={{ backgroundColor: "#d598aa" }}
-          >
-            ✓
+        <div className="flex flex-col" style={{ height: "calc(100dvh - 48px)" }}>
+          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5">
+            {/* Message de confirmation */}
+            <div className="text-center">
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-3"
+                style={{ backgroundColor: "#d598aa" }}
+              >
+                ✓
+              </div>
+              <h2 className="text-lg font-bold mb-1">{t.successTitle}</h2>
+              <p className="text-sm" style={{ color: "#bba8a1" }}>{t.successMsg}</p>
+            </div>
+
+            {/* Récapitulatif de la commande */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: "#f7f4f3", border: "1px solid #ded5d1" }}>
+              <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#bba8a1" }}>
+                {t.recap}
+              </p>
+              <div className="space-y-1.5">
+                {selectedOffers.map((o) => (
+                  <div key={o.id} className="flex justify-between text-xs">
+                    <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
+                      {lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}
+                    </span>
+                    <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
+                  </div>
+                ))}
+                {selectedProducts.map((p) => {
+                  const qty = quantities[p.ref];
+                  const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+                  return (
+                    <div key={p.ref} className="flex justify-between text-xs">
+                      <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
+                        {lang === "de" ? p.nameDe : p.nameFr}
+                        {p.size ? ` (${p.size})` : ""} ×{qty}
+                        {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
+                      </span>
+                      <span className="font-semibold">{formatCHF(paid * p.price)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3 pt-3 border-t space-y-1" style={{ borderColor: "#ded5d1" }}>
+                <div className="flex justify-between text-xs">
+                  <span style={{ color: "#bba8a1" }}>{t.shippingLabel}</span>
+                  <span>{shipping === 0 ? t.shippingFree : formatCHF(SHIPPING_COST)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold pt-1">
+                  <span>{t.total}</span>
+                  <span style={{ color: "#d598aa" }}>{formatCHF(total)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span style={{ color: "#bba8a1" }}>{t.totalTTC}</span>
+                  <span style={{ color: "#bba8a1" }}>{formatCHF(totalTTC)}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-xl font-bold mb-2">{t.successTitle}</h2>
-          <p className="text-sm" style={{ color: "#bba8a1" }}>
-            {t.successMsg}
-          </p>
-          <button
-            onClick={onClose}
-            className="mt-6 px-8 py-3 rounded-xl text-white text-sm font-semibold"
-            style={{ backgroundColor: "#d598aa" }}
-          >
-            {t.btnClose}
-          </button>
+
+          <div className="px-5 py-4 border-t shrink-0" style={{ borderColor: "#ded5d1" }}>
+            <button
+              onClick={onClose}
+              className="w-full py-3.5 rounded-xl text-white text-sm font-semibold"
+              style={{ backgroundColor: "#d598aa" }}
+            >
+              {t.btnClose}
+            </button>
+          </div>
         </div>
       </ModalShell>
     );
@@ -289,19 +340,17 @@ export default function OrderModal({
           )}
 
           <Field label={t.notes} value={c.notes} onChange={(v) => upd("notes", v)} multiline />
-        </div>
 
-        {status === "error" && (
-          <p className="px-5 py-2 text-xs text-center shrink-0" style={{ color: "#bf7585" }}>
-            {t.errorPrefix}{errorMsg}
-          </p>
-        )}
+          {status === "error" && (
+            <p className="text-xs text-center" style={{ color: "#bf7585" }}>
+              {t.errorPrefix}{errorMsg}
+            </p>
+          )}
 
-        <div className="px-5 py-4 border-t shrink-0" style={{ borderColor: "#ded5d1" }}>
           <button
             onClick={handleSubmit}
             disabled={!isValid || status === "sending"}
-            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white"
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white mt-2 mb-2"
             style={{
               backgroundColor: isValid && status === "idle" ? "#d598aa" : "#ded5d1",
               cursor: isValid && status === "idle" ? "pointer" : "not-allowed",
