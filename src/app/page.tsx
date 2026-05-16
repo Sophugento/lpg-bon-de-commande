@@ -47,7 +47,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen pb-36">
+    <main className="min-h-screen pb-52">
       {/* Header */}
       <header
         className="sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-sm"
