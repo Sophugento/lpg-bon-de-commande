@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
 import { calcPromo, formatCHF } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
@@ -400,6 +400,17 @@ function ToggleBtn({ active, onClick, label }: { active: boolean; onClick: () =>
 }
 
 function ModalShell({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50" style={{ backgroundColor: "rgba(45,32,32,0.5)" }}>
       <div
