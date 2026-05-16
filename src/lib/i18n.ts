@@ -11,7 +11,7 @@ export const TRANSLATIONS = {
     ruleMin: "Minimum de commande :",
     ruleShipping: "Frais de port :",
     ruleShippingDetail: "— offerts dès 400 CHF HT",
-    rulePromo: "Produits revente : 6 achetés = 1 offert · 10 = +2 offerts",
+    rulePromo: "Produits revente : 6 achetés = +1 offert · 10 = +2 offerts",
     ruleMinQty: "Min. 3 pièces du même produit (revente)",
 
     // Catégories
@@ -106,7 +106,7 @@ export const TRANSLATIONS = {
     ruleMin: "Mindestbestellwert:",
     ruleShipping: "Portokosten:",
     ruleShippingDetail: "— ab 400 CHF netto portofrei",
-    rulePromo: "Verkaufsprodukte: 6 gekauft = 1 geschenkt · 10 = +2 geschenkt",
+    rulePromo: "Verkaufsprodukte: 6 gekauft = +1 geschenkt · 10 = +2 geschenkt",
     ruleMinQty: "Mind. 3 Stück desselben Produkts (Verkauf)",
 
     Corps: "Körper",
