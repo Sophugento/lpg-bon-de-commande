@@ -67,6 +67,7 @@ export default function OrderModal({
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
+  const totalTTC = total * 1.081;
 
   const selectedProducts = products.filter((p) => (quantities[p.ref] || 0) > 0);
   const selectedOffers = offers.filter((o) => (offerQtys[o.id] || 0) > 0);
@@ -109,7 +110,7 @@ export default function OrderModal({
       })),
       ...selectedProducts.map((p) => {
         const qty = quantities[p.ref];
-        const { paid, free } = calcPromo(qty);
+        const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
         return {
           ref: p.ref,
           name: lang === "de" ? p.nameDe : p.nameFr,
@@ -188,78 +189,9 @@ export default function OrderModal({
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
-          {/* Coordonnées */}
-          <div className="grid grid-cols-2 gap-3">
-            <Field label={t.firstName} value={c.firstName} onChange={(v) => upd("firstName", v)} />
-            <Field label={t.lastName} value={c.lastName} onChange={(v) => upd("lastName", v)} />
-          </div>
-          <Field label={t.company} value={c.company} onChange={(v) => upd("company", v)} />
-          <Field label={t.address} value={c.address} onChange={(v) => upd("address", v)} />
-          <div className="grid grid-cols-3 gap-3">
-            <Field label={t.postalCode} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
-            <div className="col-span-2">
-              <Field label={t.city} value={c.city} onChange={(v) => upd("city", v)} />
-            </div>
-          </div>
-          <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
-          <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
 
-          {/* Adresse livraison */}
-          <div
-            className="rounded-xl p-3"
-            style={{ backgroundColor: "#f0cad620", border: "1px solid #f0cad6" }}
-          >
-            <p className="text-xs font-semibold mb-2" style={{ color: "#bf7585" }}>
-              {t.deliveryQuestion}
-            </p>
-            <div className="flex gap-3">
-              <ToggleBtn
-                active={c.sameDelivery}
-                onClick={() => upd("sameDelivery", true)}
-                label={t.deliveryYes}
-              />
-              <ToggleBtn
-                active={!c.sameDelivery}
-                onClick={() => upd("sameDelivery", false)}
-                label={t.deliveryNo}
-              />
-            </div>
-          </div>
-
-          {!c.sameDelivery && (
-            <div className="space-y-3 pt-1">
-              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#bba8a1" }}>
-                {t.deliveryTitle}
-              </p>
-              <Field
-                label={t.deliveryCompany}
-                value={c.delivery.company}
-                onChange={(v) => updDelivery("company", v)}
-              />
-              <Field
-                label={t.deliveryAddress}
-                value={c.delivery.address}
-                onChange={(v) => updDelivery("address", v)}
-              />
-              <div className="grid grid-cols-3 gap-3">
-                <Field
-                  label={t.deliveryPostalCode}
-                  value={c.delivery.postalCode}
-                  onChange={(v) => updDelivery("postalCode", v)}
-                />
-                <div className="col-span-2">
-                  <Field
-                    label={t.deliveryCity}
-                    value={c.delivery.city}
-                    onChange={(v) => updDelivery("city", v)}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Récapitulatif */}
-          <div className="pt-4 border-t" style={{ borderColor: "#ded5d1" }}>
+          {/* Récapitulatif EN PREMIER */}
+          <div className="pb-4 border-b" style={{ borderColor: "#ded5d1" }}>
             <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#bba8a1" }}>
               {t.recap}
             </p>
@@ -274,7 +206,7 @@ export default function OrderModal({
               ))}
               {selectedProducts.map((p) => {
                 const qty = quantities[p.ref];
-                const { paid, free } = calcPromo(qty);
+                const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
                 return (
                   <div key={p.ref} className="flex justify-between text-xs">
                     <span className="flex-1 truncate pr-2">
@@ -300,15 +232,63 @@ export default function OrderModal({
                 <span>{t.total}</span>
                 <span style={{ color: "#d598aa" }}>{formatCHF(total)}</span>
               </div>
+              <div className="flex justify-between text-xs">
+                <span style={{ color: "#bba8a1" }}>{t.totalTTC}</span>
+                <span style={{ color: "#bba8a1" }}>{formatCHF(totalTTC)}</span>
+              </div>
             </div>
           </div>
 
-          <Field
-            label={t.notes}
-            value={c.notes}
-            onChange={(v) => upd("notes", v)}
-            multiline
-          />
+          {/* Coordonnées */}
+          <p className="text-xs font-bold uppercase tracking-wide pt-1" style={{ color: "#bba8a1" }}>
+            {t.coordTitle}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t.firstName} value={c.firstName} onChange={(v) => upd("firstName", v)} />
+            <Field label={t.lastName} value={c.lastName} onChange={(v) => upd("lastName", v)} />
+          </div>
+          <Field label={t.company} value={c.company} onChange={(v) => upd("company", v)} />
+          <Field label={t.address} value={c.address} onChange={(v) => upd("address", v)} />
+          <div className="grid grid-cols-3 gap-3">
+            <Field label={t.postalCode} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
+            <div className="col-span-2">
+              <Field label={t.city} value={c.city} onChange={(v) => upd("city", v)} />
+            </div>
+          </div>
+          <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
+          <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
+
+          {/* Adresse livraison */}
+          <div
+            className="rounded-xl p-3"
+            style={{ backgroundColor: "#f0cad620", border: "1px solid #f0cad6" }}
+          >
+            <p className="text-xs font-semibold mb-2" style={{ color: "#bf7585" }}>
+              {t.deliveryQuestion}
+            </p>
+            <div className="flex gap-3">
+              <ToggleBtn active={c.sameDelivery} onClick={() => upd("sameDelivery", true)} label={t.deliveryYes} />
+              <ToggleBtn active={!c.sameDelivery} onClick={() => upd("sameDelivery", false)} label={t.deliveryNo} />
+            </div>
+          </div>
+
+          {!c.sameDelivery && (
+            <div className="space-y-3 pt-1">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#bba8a1" }}>
+                {t.deliveryTitle}
+              </p>
+              <Field label={t.deliveryCompany} value={c.delivery.company} onChange={(v) => updDelivery("company", v)} />
+              <Field label={t.deliveryAddress} value={c.delivery.address} onChange={(v) => updDelivery("address", v)} />
+              <div className="grid grid-cols-3 gap-3">
+                <Field label={t.deliveryPostalCode} value={c.delivery.postalCode} onChange={(v) => updDelivery("postalCode", v)} />
+                <div className="col-span-2">
+                  <Field label={t.deliveryCity} value={c.delivery.city} onChange={(v) => updDelivery("city", v)} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Field label={t.notes} value={c.notes} onChange={(v) => upd("notes", v)} multiline />
         </div>
 
         {status === "error" && (

@@ -98,7 +98,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                   <p className="text-xs font-semibold" style={{ color: "#d598aa" }}>
                     = {formatCHF(reventePaid * revente.price)}
                   </p>
-                  {reventeFree > 0 && (
+                  {revente.promoEligible && reventeFree > 0 && (
                     <p className="text-[10px]" style={{ color: "#d598aa" }}>
                       {t.promoLabel(reventeFree, reventeQty >= 10 ? "10+2" : "6+1")}
                     </p>

@@ -29,7 +29,7 @@ export default function Home() {
     const productTotal = PRODUCTS.reduce((sum, p) => {
       const qty = quantities[p.ref] || 0;
       if (qty === 0) return sum;
-      const { paid } = calcPromo(qty);
+      const { paid } = p.promoEligible ? calcPromo(qty) : { paid: qty };
       return sum + paid * p.price;
     }, 0);
     const offerTotal = OFFERS.reduce(
@@ -98,7 +98,7 @@ export default function Home() {
           {t.rulesTitle}
         </p>
         <p style={{ color: "#8a5565" }}>
-          • {t.ruleMin} <strong>250 CHF</strong> netto
+          • {t.ruleMin} <strong>250 CHF</strong> {t.priceNote}
         </p>
         <p style={{ color: "#8a5565" }}>
           • {t.ruleShipping} <strong>20 CHF</strong> {t.ruleShippingDetail}

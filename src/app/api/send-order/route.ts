@@ -54,8 +54,8 @@ function buildHtml(payload: OrderPayload): string {
   });
 
   const labels = {
-    fr: { title: "Bon de commande", date: `Date : ${date}`, coord: "Coordonnées", delivery: "Adresse de livraison", order: "Commande", ref: "Réf.", product: "Produit", qty: "Qté", unit: "P.U.", total: "Total", subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts", grandTotal: "Total", notes: "Notes", name: "Nom", studio: "Studio / Cabinet", addr: "Adresse", email: "E-mail", phone: "Tél." },
-    de: { title: "Bestellformular", date: `Datum: ${date}`, coord: "Kontaktdaten", delivery: "Lieferadresse", order: "Bestellung", ref: "Ref.", product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total", subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis", grandTotal: "Total", notes: "Bemerkungen", name: "Name", studio: "Firma / Studio", addr: "Adresse", email: "E-Mail", phone: "Tel." },
+    fr: { title: "Bon de commande", date: `Date : ${date}`, coord: "Coordonnées", delivery: "Adresse de livraison", order: "Commande", ref: "Réf.", product: "Produit", qty: "Qté", unit: "P.U.", total: "Total", subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts", grandTotal: "Total", totalTTC: "Total TTC (TVA 8.1%)", notes: "Notes", name: "Nom", studio: "Studio / Cabinet", addr: "Adresse", email: "E-mail", phone: "Tél.", typeRevente: "Revente", typeCabine: "Cabine", typeRecharge: "Recharge" },
+    de: { title: "Bestellformular", date: `Datum: ${date}`, coord: "Kontaktdaten", delivery: "Lieferadresse", order: "Bestellung", ref: "Ref.", product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total", subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis", grandTotal: "Total", totalTTC: "Total inkl. MwSt. (8.1%)", notes: "Bemerkungen", name: "Name", studio: "Firma / Studio", addr: "Adresse", email: "E-Mail", phone: "Tel.", typeRevente: "Verkauf", typeCabine: "Professionell", typeRecharge: "Nachfüllung" },
   }[lang];
 
   const sameDelivery = contact.sameDelivery;
@@ -63,14 +63,25 @@ function buildHtml(payload: OrderPayload): string {
     ? `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.delivery}</td><td style="font-size:13px">Identique / Gleich</td></tr>`
     : `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.delivery}</td><td style="font-size:13px">${deliveryAddress.company ? deliveryAddress.company + "<br>" : ""}${deliveryAddress.address}<br>${deliveryAddress.postalCode} ${deliveryAddress.city}</td></tr>`;
 
-  const rows = orderLines.map((l) => `
+  const typeLabel = (type: string) => {
+    if (type === "revente") return labels.typeRevente;
+    if (type === "professionnel") return labels.typeCabine;
+    if (type === "recharge") return labels.typeRecharge;
+    return "";
+  };
+
+  const rows = orderLines.map((l) => {
+    const tl = typeLabel(l.type);
+    const detail = [tl, l.size].filter(Boolean).join(" – ");
+    return `
     <tr style="border-bottom:1px solid #f0ebe9">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:13px">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
+      <td style="padding:7px 8px;font-size:13px">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:center">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:right">${chf(l.unitPrice)}</td>
       <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right">${chf(l.lineTotal)}</td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -110,6 +121,7 @@ function buildHtml(payload: OrderPayload): string {
         <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.subtotal}</td><td style="font-size:13px;text-align:right">${chf(subtotal)}</td></tr>
         <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.shipping}</td><td style="font-size:13px;text-align:right">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td></tr>
         <tr><td style="padding:10px 0 4px;font-size:16px;font-weight:700;border-top:2px solid #ded5d1">${labels.grandTotal}</td><td style="padding:10px 0 4px;font-size:16px;font-weight:700;text-align:right;border-top:2px solid #ded5d1;color:#d598aa">${chf(total)}</td></tr>
+        <tr><td style="padding:3px 0;font-size:11px;color:#bba8a1">${labels.totalTTC}</td><td style="font-size:11px;text-align:right;color:#bba8a1">${chf(total * 1.081)}</td></tr>
       </table>
 
       ${contact.notes ? `<div style="margin-top:20px;padding:14px;background:#f7f4f3;border-radius:10px"><p style="margin:0;font-size:12px;color:#666"><strong>${labels.notes} :</strong> ${contact.notes}</p></div>` : ""}

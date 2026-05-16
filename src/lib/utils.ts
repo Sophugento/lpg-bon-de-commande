@@ -10,8 +10,8 @@ export function formatCHF(amount: number): string {
 }
 
 export function calcPromo(qty: number): { paid: number; free: number } {
-  if (qty >= 10) return { paid: qty - 2, free: 2 };
-  if (qty >= 6) return { paid: qty - 1, free: 1 };
+  if (qty >= 10) return { paid: qty, free: 2 };
+  if (qty >= 6) return { paid: qty, free: 1 };
   return { paid: qty, free: 0 };
 }
 

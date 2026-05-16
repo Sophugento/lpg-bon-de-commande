@@ -17,7 +17,7 @@ export const TRANSLATIONS = {
     // Catégories
     Corps: "Corps",
     Visage: "Visage",
-    Nutricosmetics: "Nutricosmetics",
+    Nutricosmetics: "Nutricosmétiques",
     Cosmetotextiles: "Cosmétotextiles",
     Consommables: "Consommables",
 
@@ -41,7 +41,7 @@ export const TRANSLATIONS = {
       "Yeux & Lèvres": "Yeux & Lèvres",
       "Régénérer": "Régénérer",
       "Mains": "Mains",
-      "Nutricosmetics": "Nutricosmetics",
+      "Nutricosmetics": "Nutricosmétiques",
       "Cosmetotextiles": "Cosmétotextiles",
       "Consommables": "Consommables",
     } as Record<string, string>,
