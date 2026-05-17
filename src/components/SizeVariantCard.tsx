@@ -67,20 +67,22 @@ export default function SizeVariantCard({
             return (
               <div
                 key={p.ref}
-                className="px-4 py-2.5 flex items-center gap-2"
+                className="px-4 py-2.5"
                 style={idx < products.length - 1 ? { borderBottom: "1px solid #f0ebe9" } : {}}
               >
-                <span className="text-xs font-semibold w-14 shrink-0" style={{ color: "#bba8a1" }}>
-                  {p.size}
-                </span>
-                <span className="text-sm font-bold shrink-0 w-20 whitespace-nowrap" style={{ color: "#2d2020" }}>
-                  {formatCHF(p.price)}
-                </span>
-                <QuantitySelector value={qty} onChange={(v) => onChange(p.ref, v)} />
-                {qty > 0 && (
-                  <span className="text-xs font-semibold whitespace-nowrap shrink-0" style={{ color: "#d598aa" }}>
-                    = {formatCHF(qty * p.price)}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold w-14 shrink-0" style={{ color: "#bba8a1" }}>
+                    {p.size}
                   </span>
+                  <span className="text-sm font-bold shrink-0 w-20 whitespace-nowrap" style={{ color: "#2d2020" }}>
+                    {formatCHF(p.price)}
+                  </span>
+                  <QuantitySelector value={qty} onChange={(v) => onChange(p.ref, v)} />
+                </div>
+                {qty > 0 && (
+                  <p className="text-xs font-semibold mt-1 pl-16" style={{ color: "#d598aa" }}>
+                    = {formatCHF(qty * p.price)}
+                  </p>
                 )}
               </div>
             );

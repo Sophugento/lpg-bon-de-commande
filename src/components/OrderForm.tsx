@@ -165,6 +165,7 @@ export default function OrderForm({ catalog }: Props) {
       {modalOpen && (
         <OrderModal
           onClose={() => setModalOpen(false)}
+          onSuccess={() => { setModalOpen(false); setQuantities({}); setOfferQtys({}); }}
           products={products}
           offers={offers}
           quantities={quantities}

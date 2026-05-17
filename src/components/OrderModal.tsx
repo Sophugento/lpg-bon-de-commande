@@ -28,6 +28,7 @@ interface ContactInfo {
 
 interface Props {
   onClose: () => void;
+  onSuccess: () => void;
   products: Product[];
   offers: Offer[];
   quantities: Record<string, number>;
@@ -41,6 +42,7 @@ const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city
 
 export default function OrderModal({
   onClose,
+  onSuccess,
   products,
   offers,
   quantities,
@@ -215,7 +217,7 @@ export default function OrderModal({
 
           <div className="px-5 py-4 border-t shrink-0" style={{ borderColor: "#ded5d1" }}>
             <button
-              onClick={onClose}
+              onClick={onSuccess}
               className="w-full py-3.5 rounded-xl text-white text-sm font-semibold"
               style={{ backgroundColor: "#d598aa" }}
             >
