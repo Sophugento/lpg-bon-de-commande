@@ -20,6 +20,9 @@ export const TRANSLATIONS = {
     Nutricosmetics: "Nutricosmétiques",
     Cosmetotextiles: "Cosmétotextiles",
     Consommables: "Consommables",
+    Goodies: "Goodies",
+    Textiles: "Textiles",
+    Mobilier: "Mobilier",
 
     // Sections
     offresSpeciales: "Offres Spéciales",
@@ -44,6 +47,11 @@ export const TRANSLATIONS = {
       "Nutricosmetics": "Nutricosmétiques",
       "Cosmetotextiles": "Cosmétotextiles",
       "Consommables": "Consommables",
+      "Goodies": "Goodies",
+      "Tenues": "Tenues",
+      "Accessoires": "Accessoires",
+      "Textiles": "Textiles",
+      "Mobilier": "Mobilier",
     } as Record<string, string>,
 
     // Prix
@@ -114,6 +122,9 @@ export const TRANSLATIONS = {
     Nutricosmetics: "Nutricosmetics",
     Cosmetotextiles: "Kosmetotextilien",
     Consommables: "Material-Bedarf",
+    Goodies: "Goodies",
+    Textiles: "Textilien",
+    Mobilier: "Möbel",
 
     offresSpeciales: "Sonderangebote",
 
@@ -135,6 +146,11 @@ export const TRANSLATIONS = {
       "Nutricosmetics": "Nutricosmetics",
       "Cosmetotextiles": "Kosmetotextilien",
       "Consommables": "Material-Bedarf",
+      "Goodies": "Goodies",
+      "Tenues": "Bekleidung",
+      "Accessoires": "Zubehör",
+      "Textiles": "Textilien",
+      "Mobilier": "Möbel",
     } as Record<string, string>,
 
     htNote: "Alle Preise sind Nettopreise (exkl. MwSt.)",

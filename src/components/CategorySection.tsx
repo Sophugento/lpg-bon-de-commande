@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Product } from "@/data/products";
+import { ProductInfo } from "@/data/productInfo";
 import ProductPairCard from "./ProductPairCard";
 import { T, Lang } from "@/lib/i18n";
 
@@ -12,6 +13,7 @@ interface Props {
   onChange: (ref: string, qty: number) => void;
   t: T;
   lang: Lang;
+  productInfo: Record<string, ProductInfo>;
 }
 
 // Regroupe les produits par nom FR + subcategory → paires (revente + cabine)
@@ -39,7 +41,7 @@ function groupBySubcategory(products: Product[]): Record<string, Product[]> {
   }, {} as Record<string, Product[]>);
 }
 
-export default function CategorySection({ category, products, quantities, onChange, t, lang }: Props) {
+export default function CategorySection({ category, products, quantities, onChange, t, lang, productInfo }: Props) {
   const [open, setOpen] = useState(false);
   const activeCount = products.filter((p) => (quantities[p.ref] || 0) > 0).length;
   const grouped = useMemo(() => groupBySubcategory(products), [products]);
@@ -90,6 +92,7 @@ export default function CategorySection({ category, products, quantities, onChan
                   onChange={onChange}
                   t={t}
                   lang={lang}
+                  productInfo={productInfo}
                 />
               ))}
             </div>

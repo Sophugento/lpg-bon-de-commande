@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Product } from "@/data/products";
-import { PRODUCT_INFO } from "@/data/productInfo";
+import { ProductInfo } from "@/data/productInfo";
 import { calcPromo, formatCHF, translateSize } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
 import QuantitySelector from "./QuantitySelector";
@@ -14,9 +14,10 @@ interface Props {
   onChange: (ref: string, qty: number) => void;
   t: T;
   lang: Lang;
+  productInfo: Record<string, ProductInfo>;
 }
 
-export default function ProductPairCard({ products, quantities, onChange, t, lang }: Props) {
+export default function ProductPairCard({ products, quantities, onChange, t, lang, productInfo }: Props) {
   const [showInfo, setShowInfo] = useState(false);
 
   const revente = products.find((p) => p.type === "revente");
@@ -26,7 +27,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
   const nameFr = products[0].nameFr;
   const nameDe = products[0].nameDe;
   const name = lang === "de" ? nameDe : nameFr;
-  const info = PRODUCT_INFO[nameFr];
+  const info = productInfo[nameFr];
 
   const hasRevente = Boolean(revente);
   const hasCabine = Boolean(cabine || recharge);
@@ -73,12 +74,14 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
               className="flex-1 px-3 py-3"
               style={isPair ? { borderRight: "1px solid #f0ebe9" } : {}}
             >
-              <span
-                className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
-                style={{ backgroundColor: "#d598aa" }}
-              >
-                {t.revente}
-              </span>
+              {isPair && (
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
+                  style={{ backgroundColor: "#d598aa" }}
+                >
+                  {t.revente}
+                </span>
+              )}
               <p className="text-xs" style={{ color: "#bba8a1" }}>
                 {translateSize(revente.size, lang)}
               </p>
@@ -121,12 +124,14 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
             const bgColor = recharge ? "#e8c0cc" : "#bba8a1";
             return (
               <div className="flex-1 px-3 py-3" style={{ backgroundColor: "#faf9f8" }}>
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
-                  style={{ backgroundColor: bgColor }}
-                >
-                  {typeLabel}
-                </span>
+                {isPair && (
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    {typeLabel}
+                  </span>
+                )}
                 <p className="text-xs" style={{ color: "#bba8a1" }}>
                   {translateSize(prod.size, lang)}
                 </p>
