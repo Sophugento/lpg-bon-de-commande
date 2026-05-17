@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Product } from "@/data/products";
 import { ProductInfo } from "@/data/productInfo";
 import ProductPairCard from "./ProductPairCard";
+import SizeVariantCard from "./SizeVariantCard";
 import { T, Lang } from "@/lib/i18n";
 
 interface Props {
@@ -16,21 +17,50 @@ interface Props {
   productInfo: Record<string, ProductInfo>;
 }
 
-// Regroupe les produits par nom FR + subcategory → paires (revente + cabine)
-function groupIntoPairs(products: Product[]): Product[][] {
+type CardGroup =
+  | { kind: "pair"; products: Product[] }
+  | { kind: "sizes"; baseName: string; baseNameDe: string; products: Product[] };
+
+function getBaseName(nameFr: string): string {
+  const idx = nameFr.indexOf(" — ");
+  return idx >= 0 ? nameFr.slice(0, idx) : nameFr;
+}
+
+function groupProducts(products: Product[]): CardGroup[] {
+  // Count products per base name (only those with a size field)
+  const baseCount = new Map<string, number>();
+  for (const p of products) {
+    if (p.size) {
+      const base = getBaseName(p.nameFr);
+      baseCount.set(base, (baseCount.get(base) || 0) + 1);
+    }
+  }
+
   const seen = new Set<string>();
-  const pairs: Product[][] = [];
+  const result: CardGroup[] = [];
 
   for (const p of products) {
-    const key = `${p.subcategory}__${p.nameFr}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const group = products.filter(
-      (x) => x.nameFr === p.nameFr && x.subcategory === p.subcategory
-    );
-    pairs.push(group);
+    const base = getBaseName(p.nameFr);
+    const isSizeVariant = p.size !== "" && (baseCount.get(base) || 0) > 1;
+
+    if (isSizeVariant) {
+      if (seen.has(`sizes__${base}`)) continue;
+      seen.add(`sizes__${base}`);
+      const group = products.filter((x) => getBaseName(x.nameFr) === base && x.size !== "");
+      // baseName DE: take part before " — " from first product's nameDe
+      const baseNameDe = getBaseName(group[0].nameDe);
+      result.push({ kind: "sizes", baseName: base, baseNameDe, products: group });
+    } else {
+      const key = `${p.subcategory}__${p.nameFr}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const group = products.filter(
+        (x) => x.nameFr === p.nameFr && x.subcategory === p.subcategory
+      );
+      result.push({ kind: "pair", products: group });
+    }
   }
-  return pairs;
+  return result;
 }
 
 function groupBySubcategory(products: Product[]): Record<string, Product[]> {
@@ -45,6 +75,12 @@ export default function CategorySection({ category, products, quantities, onChan
   const [open, setOpen] = useState(false);
   const activeCount = products.filter((p) => (quantities[p.ref] || 0) > 0).length;
   const grouped = useMemo(() => groupBySubcategory(products), [products]);
+  const groupedCards = useMemo(
+    () => Object.fromEntries(
+      Object.entries(grouped).map(([sub, prods]) => [sub, groupProducts(prods)])
+    ),
+    [grouped]
+  );
 
   const catName = (t as Record<string, unknown>)[category] as string ?? category;
 
@@ -74,7 +110,7 @@ export default function CategorySection({ category, products, quantities, onChan
 
       {open && (
         <div className="px-3 py-3" style={{ backgroundColor: "#f7f4f3" }}>
-          {Object.entries(grouped).map(([sub, prods]) => (
+          {Object.entries(grouped).map(([sub]) => (
             <div key={sub}>
               {sub !== category && (
                 <p
@@ -84,17 +120,31 @@ export default function CategorySection({ category, products, quantities, onChan
                   {t.subcategories[sub] ?? sub}
                 </p>
               )}
-              {groupIntoPairs(prods).map((pair) => (
-                <ProductPairCard
-                  key={pair.map((p) => p.ref).join("_")}
-                  products={pair}
-                  quantities={quantities}
-                  onChange={onChange}
-                  t={t}
-                  lang={lang}
-                  productInfo={productInfo}
-                />
-              ))}
+              {groupedCards[sub].map((card) =>
+                card.kind === "sizes" ? (
+                  <SizeVariantCard
+                    key={card.baseName}
+                    baseName={card.baseName}
+                    baseNameDe={card.baseNameDe}
+                    products={card.products}
+                    quantities={quantities}
+                    onChange={onChange}
+                    t={t}
+                    lang={lang}
+                    productInfo={productInfo}
+                  />
+                ) : (
+                  <ProductPairCard
+                    key={card.products.map((p) => p.ref).join("_")}
+                    products={card.products}
+                    quantities={quantities}
+                    onChange={onChange}
+                    t={t}
+                    lang={lang}
+                    productInfo={productInfo}
+                  />
+                )
+              )}
             </div>
           ))}
         </div>
