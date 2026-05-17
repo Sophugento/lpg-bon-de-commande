@@ -27,10 +27,10 @@ function getBaseName(nameFr: string): string {
 }
 
 function groupProducts(products: Product[]): CardGroup[] {
-  // Count products per base name (only those with a size field)
+  // Only products whose nameFr contains " — " can be size variants (e.g. "TUNIQUE NOIRE — S/36")
   const baseCount = new Map<string, number>();
   for (const p of products) {
-    if (p.size) {
+    if (p.nameFr.includes(" — ")) {
       const base = getBaseName(p.nameFr);
       baseCount.set(base, (baseCount.get(base) || 0) + 1);
     }
@@ -41,7 +41,7 @@ function groupProducts(products: Product[]): CardGroup[] {
 
   for (const p of products) {
     const base = getBaseName(p.nameFr);
-    const isSizeVariant = p.size !== "" && (baseCount.get(base) || 0) > 1;
+    const isSizeVariant = p.nameFr.includes(" — ") && (baseCount.get(base) || 0) > 1;
 
     if (isSizeVariant) {
       if (seen.has(`sizes__${base}`)) continue;
