@@ -106,7 +106,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                       {t.promoLabel(reventeFree, reventeQty >= 10 ? "10+2" : "6+1")}
                     </p>
                   )}
-                  {reventeQty < 3 && reventeQty > 0 && (
+                  {revente.promoEligible && reventeQty < 3 && reventeQty > 0 && (
                     <p className="text-[10px]" style={{ color: "#bf7585" }}>
                       {t.minQtyWarning}
                     </p>
