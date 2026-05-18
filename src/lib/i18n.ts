@@ -66,7 +66,7 @@ export const TRANSLATIONS = {
     // Barre commande
     sousTotal: "Sous-total",
     port: "Frais de port",
-    portOffert: "Offert ✓",
+    portOffert: "Offerts ✓",
     portOffertDes: "Frais de port offerts dès 400,00 CHF",
     total: "Total",
     totalTTC: "Total TTC (TVA 8.1%)",
