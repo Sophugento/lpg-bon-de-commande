@@ -12,7 +12,7 @@ interface GvizTable {
 
 async function fetchSheet(sheetName: string): Promise<Record<string, unknown>[]> {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
-  const res = await fetch(url, { next: { revalidate: 300 } }); // revalidate every 5 min
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Sheet fetch failed: ${sheetName}`);
   const text = await res.text();
   const start = text.indexOf("{");
