@@ -549,8 +549,8 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
   "LINGETTES DÉSINFECTANTES": {
     description: "Lingettes désinfectantes Aseptonet — bactéricide, fongicide, virucide.",
     descriptionDe: "Desinfektionstücher Aseptonet — bakterizid, fungizid, viruzid.",
-    benefits: ["Triple action désinfectante", "Testées dermatologiquement", "Boîte de 100"],
-    benefitsDe: ["Dreifache Desinfektionswirkung", "Dermatologisch getestet", "100er-Box"],
+    benefits: ["Triple action désinfectante", "Anti-fongicide", "Boîte de 100"],
+    benefitsDe: ["Dreifache Desinfektionswirkung", "Antimykotisch", "100er-Box"],
     imageUrl: "/images/products/marketing_Conso_CABINE_KABINE_main_03.png",
   },
   "ENDERMOWEAR HOMME — GRIS": {
@@ -619,8 +619,8 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
   "TONGS / FLIPS": {
     description: "Tongs LPG pour les clients en cabine.",
     descriptionDe: "LPG-Flip-Flops für Kabinenkunden.",
-    benefits: ["Hygiénique", "Usage cabine", "Marquage LPG"],
-    benefitsDe: ["Hygienisch", "Kabinengebrauch", "LPG-Aufdruck"],
+    benefits: ["Hygiénique", "Usage cabine", "Coloris blanc"],
+    benefitsDe: ["Hygienisch", "Kabinengebrauch", "Weiße Farbe"],
     imageUrl: "/images/products/tongs.jpg",
   },
 };

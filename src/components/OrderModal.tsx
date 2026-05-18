@@ -90,6 +90,7 @@ export default function OrderModal({
     c.firstName.trim() &&
     c.lastName.trim() &&
     c.email.trim() &&
+    c.phone.trim() &&
     c.address.trim() &&
     c.postalCode.trim() &&
     c.city.trim() &&
