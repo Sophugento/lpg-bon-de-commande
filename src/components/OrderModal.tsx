@@ -110,6 +110,7 @@ export default function OrderModal({
         unitPrice: o.price,
         freeQty: 0,
         lineTotal: offerQtys[o.id] * o.price,
+        description: o.description,
       })),
       ...selectedProducts.map((p) => {
         const qty = quantities[p.ref];

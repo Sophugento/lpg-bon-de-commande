@@ -9,6 +9,7 @@ interface OrderLine {
   unitPrice: number;
   freeQty: number;
   lineTotal: number;
+  description?: string;
 }
 
 interface Address {
@@ -73,10 +74,13 @@ function buildHtml(payload: OrderPayload): string {
   const rows = orderLines.map((l) => {
     const tl = typeLabel(l.type);
     const detail = [tl, l.size].filter(Boolean).join(" – ");
+    const descHtml = l.type === "offre" && l.description
+      ? `<br><span style="font-size:11px;color:#bba8a1;font-weight:400">${l.description}</span>`
+      : "";
     return `
     <tr style="border-bottom:1px solid #f0ebe9">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:13px">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}</td>
+      <td style="padding:7px 8px;font-size:13px">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:center">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:right">${chf(l.unitPrice)}</td>
       <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right">${chf(l.lineTotal)}</td>
