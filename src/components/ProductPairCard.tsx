@@ -124,7 +124,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
             const bgColor = recharge ? "#e8c0cc" : "#bba8a1";
             return (
               <div className="flex-1 px-3 py-3" style={{ backgroundColor: "#faf9f8" }}>
-                {isPair && (
+                {(isPair || !hasRevente) && (
                   <span
                     className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
                     style={{ backgroundColor: bgColor }}
