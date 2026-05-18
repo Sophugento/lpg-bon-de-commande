@@ -505,8 +505,8 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
   "MOBICUBE XL": {
     description: "Meuble colonne mobile LPG avec rangements multiples.",
     descriptionDe: "Mobiler LPG-Hochschrank mit mehreren Ablagen.",
-    benefits: ["Hauteur L:197cm", "Rangements multiples", "Roues pivotantes"],
-    benefitsDe: ["Höhe L:197cm", "Mehrere Ablagen", "Drehrollen"],
+    benefits: ["L:49/l:43/H:105cm", "Rangements multiples", "Roues pivotantes"],
+    benefitsDe: ["L:49/l:43/H:105cm", "Mehrere Ablagen", "Drehrollen"],
     imageUrl: "/images/products/marketing_Conso_CABINE_KABINE_alt2_01.png",
   },
 
