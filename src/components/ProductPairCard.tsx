@@ -74,7 +74,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
               className="flex-1 px-3 py-3"
               style={isPair ? { borderRight: "1px solid #f0ebe9" } : {}}
             >
-              {isPair && (
+              {(isPair || !hasCabine) && (
                 <span
                   className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
                   style={{ backgroundColor: "#d598aa" }}
