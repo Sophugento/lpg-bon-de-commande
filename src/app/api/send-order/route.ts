@@ -10,6 +10,7 @@ interface OrderLine {
   freeQty: number;
   lineTotal: number;
   description?: string;
+  gift?: string;
 }
 
 interface Address {
@@ -74,8 +75,8 @@ function buildHtml(payload: OrderPayload): string {
   const rows = orderLines.map((l) => {
     const tl = typeLabel(l.type);
     const detail = [tl, l.size].filter(Boolean).join(" – ");
-    const descHtml = l.type === "offre" && l.description
-      ? `<br><span style="font-size:11px;color:#bba8a1;font-weight:400">${l.description}</span>`
+    const descHtml = l.type === "offre" && (l.description || l.gift)
+      ? `${l.description ? `<br><span style="font-size:11px;color:#bba8a1;font-weight:400">${l.description}</span>` : ""}${l.gift ? `<br><span style="font-size:11px;color:#d598aa;font-weight:400">🎁 ${l.gift}</span>` : ""}`
       : "";
     return `
     <tr style="border-bottom:1px solid #f0ebe9">
