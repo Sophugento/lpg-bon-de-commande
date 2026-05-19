@@ -101,7 +101,7 @@ export const TRANSLATIONS = {
     btnSending: "Envoi en cours…",
     successTitle: "Commande envoyée !",
     successMsg:
-      "Merci pour votre commande. Notre équipe la prend en charge et vous recontactera très prochainement.",
+      "Merci pour votre commande. Notre équipe la prend en charge et vous recontactera très prochainement. Cette commande est sous réserve des produits disponibles.",
     btnClose: "Fermer",
     errorPrefix: "Erreur : ",
   },
@@ -196,7 +196,7 @@ export const TRANSLATIONS = {
     btnSending: "Wird gesendet…",
     successTitle: "Bestellung gesendet!",
     successMsg:
-      "Vielen Dank für Ihre Bestellung. Unser Team kümmert sich darum und meldet sich in Kürze bei Ihnen.",
+      "Vielen Dank für Ihre Bestellung. Unser Team kümmert sich darum und meldet sich in Kürze bei Ihnen. Diese Bestellung erfolgt vorbehaltlich der Verfügbarkeit der Produkte.",
     btnClose: "Schliessen",
     errorPrefix: "Fehler: ",
   },
