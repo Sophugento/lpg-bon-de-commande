@@ -616,7 +616,7 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     benefitsDe: ["Offizielles LPG", "Premium-Qualität", "Professionelle Kennzeichnung"],
     imageUrl: "/images/products/badge_lpg.png",
   },
-  "TONGS / FLIPS": {
+  "TONGS": {
     description: "Tongs LPG pour les clients en cabine.",
     descriptionDe: "LPG-Flip-Flops für Kabinenkunden.",
     benefits: ["Hygiénique", "Usage cabine", "Coloris blanc"],
