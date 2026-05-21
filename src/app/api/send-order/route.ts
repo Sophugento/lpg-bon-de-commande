@@ -140,45 +140,65 @@ function buildHtml(payload: OrderPayload): string {
 }
 
 function buildConfirmHtml(payload: OrderPayload): string {
-  const { contact, orderLines, subtotal, shipping, total, lang } = payload;
+  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, lang } = payload;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit", month: "2-digit", year: "numeric",
   });
 
   const labels = {
     fr: {
-      title: "Confirmation de commande",
-      intro: `Bonjour ${contact.firstName},`,
-      body: "Nous avons bien reçu votre commande et la traitons dans les plus brefs délais. Vous trouverez ci-dessous le récapitulatif de votre commande.",
-      stock: "⚠️ Cette commande est sous réserve des produits disponibles en stock. Notre équipe vous recontactera si un article n'est pas disponible.",
-      order: "Votre commande",
-      product: "Produit", qty: "Qté", unit: "P.U.", total: "Total",
+      title: "Confirmation de commande", date: `Date : ${date}`,
+      coord: "Vos coordonnées", delivery: "Adresse de livraison",
+      order: "Récapitulatif de votre commande",
+      ref: "Réf.", product: "Produit", qty: "Qté", unit: "P.U.", total: "Total",
       subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts",
       grandTotal: "Total HT", totalTTC: "Total TTC (TVA 8.1%)",
+      name: "Nom", studio: "Studio / Cabinet", addr: "Adresse", email: "E-mail", phone: "Tél.",
+      notes: "Remarques",
+      stock: "Cette commande est sous réserve des produits disponibles en stock. Notre équipe vous recontactera si un article n'est pas disponible.",
       closing: "Merci pour votre confiance.",
       team: "L'équipe LPG Switzerland",
+      typeRevente: "Revente", typeCabine: "Cabine", typeRecharge: "Recharge",
     },
     de: {
-      title: "Bestellbestätigung",
-      intro: `Guten Tag ${contact.firstName},`,
-      body: "Wir haben Ihre Bestellung erhalten und bearbeiten sie so schnell wie möglich. Nachfolgend finden Sie die Zusammenfassung Ihrer Bestellung.",
-      stock: "⚠️ Diese Bestellung erfolgt vorbehaltlich der Verfügbarkeit der Produkte auf Lager. Unser Team meldet sich bei Ihnen, falls ein Artikel nicht verfügbar sein sollte.",
-      order: "Ihre Bestellung",
-      product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total",
+      title: "Bestellbestätigung", date: `Datum: ${date}`,
+      coord: "Ihre Kontaktdaten", delivery: "Lieferadresse",
+      order: "Zusammenfassung Ihrer Bestellung",
+      ref: "Ref.", product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total",
       subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis",
       grandTotal: "Total netto", totalTTC: "Total inkl. MwSt. (8.1%)",
+      name: "Name", studio: "Firma / Studio", addr: "Adresse", email: "E-Mail", phone: "Tel.",
+      notes: "Bemerkungen",
+      stock: "Diese Bestellung erfolgt vorbehaltlich der Verfügbarkeit der Produkte auf Lager. Unser Team meldet sich bei Ihnen, falls ein Artikel nicht verfügbar sein sollte.",
       closing: "Vielen Dank für Ihr Vertrauen.",
       team: "Das LPG Switzerland Team",
+      typeRevente: "Verkauf", typeCabine: "Professionell", typeRecharge: "Nachfüllung",
     },
   }[lang];
 
-  const rows = orderLines.map((l) => `
-    <tr>
-      <td style="padding:8px;font-size:13px;color:#2d2020;border-bottom:1px solid #f0ebe9">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
-      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
-      <td style="padding:8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.unitPrice)}</td>
-      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.lineTotal)}</td>
-    </tr>`).join("");
+  const typeLabel = (type: string) => {
+    if (type === "revente") return labels.typeRevente;
+    if (type === "professionnel") return labels.typeCabine;
+    if (type === "recharge") return labels.typeRecharge;
+    return "";
+  };
+
+  const sameDelivery = contact.sameDelivery;
+  const deliveryRow = sameDelivery
+    ? `<tr><td style="padding:4px 0;font-size:13px;color:#666666;width:140px;font-family:Arial,sans-serif">${labels.delivery}</td><td style="font-size:13px;font-family:Arial,sans-serif">= ${labels.coord}</td></tr>`
+    : `<tr><td style="padding:4px 0;font-size:13px;color:#666666;width:140px;font-family:Arial,sans-serif">${labels.delivery}</td><td style="font-size:13px;font-family:Arial,sans-serif">${deliveryAddress.company ? deliveryAddress.company + "<br>" : ""}${deliveryAddress.address}<br>${deliveryAddress.postalCode} ${deliveryAddress.city}</td></tr>`;
+
+  const rows = orderLines.map((l) => {
+    const tl = typeLabel(l.type);
+    const detail = [tl, l.size].filter(Boolean).join(" – ");
+    return `<tr>
+      <td style="padding:7px 8px;font-size:11px;color:#999999;border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.ref}</td>
+      <td style="padding:7px 8px;font-size:13px;border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;font-family:Arial,sans-serif">${chf(l.unitPrice)}</td>
+      <td style="padding:7px 8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;font-family:Arial,sans-serif">${chf(l.lineTotal)}</td>
+    </tr>`;
+  }).join("");
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -190,7 +210,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
 <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f7f4f3">
 <tr><td align="center" style="padding:24px 16px">
 
-  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#ffffff;border:1px solid #ded5d1">
+  <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background-color:#ffffff;border:1px solid #ded5d1">
 
     <!-- HEADER -->
     <tr>
@@ -204,24 +224,31 @@ function buildConfirmHtml(payload: OrderPayload): string {
     <tr>
       <td style="padding:28px 32px">
 
-        <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#2d2020;font-family:Arial,sans-serif">${labels.intro}</p>
-        <p style="margin:0 0 24px;font-size:13px;color:#555555;line-height:1.6;font-family:Arial,sans-serif">${labels.body}</p>
-
         <!-- Stock notice -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px">
           <tr>
             <td bgcolor="#fff8f0" style="padding:14px 16px;background-color:#fff8f0;border:1px solid #f5c542;border-left:4px solid #f5c542">
-              <p style="margin:0;font-size:13px;color:#7a5c00;line-height:1.6;font-family:Arial,sans-serif">${labels.stock}</p>
+              <p style="margin:0;font-size:13px;color:#7a5c00;line-height:1.6;font-family:Arial,sans-serif">⚠️ ${labels.stock}</p>
             </td>
           </tr>
         </table>
 
-        <!-- Section title -->
-        <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
+        <!-- Coordonnées -->
+        <p style="margin:0 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.coord}</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px">
+          <tr><td style="padding:4px 0;font-size:13px;color:#666666;width:140px;font-family:Arial,sans-serif">${labels.name}</td><td style="font-size:13px;font-weight:700;font-family:Arial,sans-serif">${contact.firstName} ${contact.lastName}</td></tr>
+          ${contact.company ? `<tr><td style="padding:4px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.studio}</td><td style="font-size:13px;font-family:Arial,sans-serif">${contact.company}</td></tr>` : ""}
+          <tr><td style="padding:4px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.addr}</td><td style="font-size:13px;font-family:Arial,sans-serif">${contact.address}, ${contact.postalCode} ${contact.city}</td></tr>
+          <tr><td style="padding:4px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.email}</td><td style="font-size:13px;font-family:Arial,sans-serif">${contact.email}</td></tr>
+          ${contact.phone ? `<tr><td style="padding:4px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.phone}</td><td style="font-size:13px;font-family:Arial,sans-serif">${contact.phone}</td></tr>` : ""}
+          ${deliveryRow}
+        </table>
 
-        <!-- Products table -->
+        <!-- Commande -->
+        <p style="margin:0 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
           <tr bgcolor="#f7f4f3">
+            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700;font-family:Arial,sans-serif">${labels.ref}</th>
             <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700;font-family:Arial,sans-serif">${labels.product}</th>
             <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700;font-family:Arial,sans-serif">${labels.qty}</th>
             <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.unit}</th>
@@ -230,25 +257,27 @@ function buildConfirmHtml(payload: OrderPayload): string {
           ${rows}
         </table>
 
-        <!-- Totals -->
+        <!-- Totaux -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px">
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.subtotal}</td>
-            <td style="padding:5px 0;font-size:13px;text-align:right;font-family:Arial,sans-serif">${chf(subtotal)}</td>
+            <td style="padding:5px 0;font-size:13px;text-align:right;white-space:nowrap;font-family:Arial,sans-serif">${chf(subtotal)}</td>
           </tr>
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.shipping}</td>
-            <td style="padding:5px 0;font-size:13px;text-align:right;font-family:Arial,sans-serif">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td>
+            <td style="padding:5px 0;font-size:13px;text-align:right;white-space:nowrap;font-family:Arial,sans-serif">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td>
           </tr>
           <tr>
             <td style="padding:12px 0 4px;font-size:16px;font-weight:700;color:#2d2020;border-top:2px solid #ded5d1;font-family:Arial,sans-serif">${labels.grandTotal}</td>
-            <td style="padding:12px 0 4px;font-size:16px;font-weight:700;text-align:right;color:#d598aa;border-top:2px solid #ded5d1;font-family:Arial,sans-serif;white-space:nowrap">${chf(total)}</td>
+            <td style="padding:12px 0 4px;font-size:16px;font-weight:700;text-align:right;color:#d598aa;border-top:2px solid #ded5d1;white-space:nowrap;font-family:Arial,sans-serif">${chf(total)}</td>
           </tr>
           <tr>
             <td style="padding:3px 0;font-size:11px;color:#bba8a1;font-family:Arial,sans-serif">${labels.totalTTC}</td>
-            <td style="padding:3px 0;font-size:11px;text-align:right;color:#bba8a1;font-family:Arial,sans-serif;white-space:nowrap">${chf(total * 1.081)}</td>
+            <td style="padding:3px 0;font-size:11px;text-align:right;color:#bba8a1;white-space:nowrap;font-family:Arial,sans-serif">${chf(total * 1.081)}</td>
           </tr>
         </table>
+
+        ${contact.notes ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px"><tr><td bgcolor="#f7f4f3" style="padding:14px;background-color:#f7f4f3"><p style="margin:0;font-size:12px;color:#666666;font-family:Arial,sans-serif"><strong>${labels.notes} :</strong> ${contact.notes}</p></td></tr></table>` : ""}
 
         <p style="margin:28px 0 4px;font-size:13px;color:#555555;font-family:Arial,sans-serif">${labels.closing}</p>
         <p style="margin:0;font-size:13px;font-weight:700;color:#2d2020;font-family:Arial,sans-serif">${labels.team}</p>
