@@ -44,6 +44,7 @@ export default function SizeVariantCard({
   products,
   quantities,
   onChange,
+  t,
   lang,
   productInfo,
 }: Props) {
