@@ -193,32 +193,73 @@ export default function OrderModal({
               <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#bba8a1" }}>
                 {t.recap}
               </p>
-              <div className="space-y-1.5">
-                {selectedOffers.map((o) => (
-                  <div key={o.id} className="flex justify-between text-xs">
-                    <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
-                      {lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}
-                    </span>
-                    <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
+              {isAdmin ? (
+                <>
+                  {/* Payants */}
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#bba8a1" }}>Produits payants</p>
+                  <div className="space-y-1.5 mb-3">
+                    {selectedOffers.map((o) => (
+                      <div key={o.id} className="flex justify-between text-xs">
+                        <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>{lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}</span>
+                        <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
+                      </div>
+                    ))}
+                    {selectedProducts.filter((p) => (quantities[p.ref] || 0) > 0).map((p) => {
+                      const qty = quantities[p.ref] || 0;
+                      return (
+                        <div key={p.ref} className="flex justify-between text-xs">
+                          <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}</span>
+                          <span className="font-semibold">{formatCHF(qty * p.price)}</span>
+                        </div>
+                      );
+                    })}
+                    {selectedOffers.length === 0 && selectedProducts.filter((p) => (quantities[p.ref] || 0) > 0).length === 0 && (
+                      <p className="text-xs italic" style={{ color: "#bba8a1" }}>Aucun produit payant</p>
+                    )}
                   </div>
-                ))}
-                {selectedProducts.map((p) => {
-                  const qty = quantities[p.ref] || 0;
-                  const paid = isAdmin ? qty : (p.promoEligible ? calcPromo(qty).paid : qty);
-                  const free = isAdmin ? (freeQuantities?.[p.ref] || 0) : (p.promoEligible ? calcPromo(qty).free : 0);
-                  return (
-                    <div key={p.ref} className="flex justify-between text-xs">
-                      <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
-                        {lang === "de" ? p.nameDe : p.nameFr}
-                        {p.size ? ` (${p.size})` : ""}
-                        {paid > 0 && <> ×{paid}</>}
-                        {free > 0 && <span style={{ color: "#d598aa" }}> +{free} offert{free > 1 ? "s" : ""}</span>}
-                      </span>
-                      <span className="font-semibold">{paid > 0 ? formatCHF(paid * p.price) : <span style={{ color: "#d598aa" }}>Offert</span>}</span>
+                  {/* Offerts */}
+                  {selectedProducts.some((p) => (freeQuantities?.[p.ref] || 0) > 0) && (
+                    <>
+                      <div className="border-t pt-3 mb-1.5" style={{ borderColor: "#f0ebe9" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#d598aa" }}>Produits offerts</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        {selectedProducts.filter((p) => (freeQuantities?.[p.ref] || 0) > 0).map((p) => {
+                          const free = freeQuantities?.[p.ref] || 0;
+                          return (
+                            <div key={p.ref} className="flex justify-between text-xs">
+                              <span className="flex-1 pr-2" style={{ color: "#d598aa" }}>{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{free}</span>
+                              <span className="font-semibold" style={{ color: "#d598aa" }}>Offert</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-1.5">
+                  {selectedOffers.map((o) => (
+                    <div key={o.id} className="flex justify-between text-xs">
+                      <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>{lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}</span>
+                      <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                  {selectedProducts.map((p) => {
+                    const qty = quantities[p.ref] || 0;
+                    const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+                    return (
+                      <div key={p.ref} className="flex justify-between text-xs">
+                        <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
+                          {lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}
+                          {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
+                        </span>
+                        <span className="font-semibold">{formatCHF(paid * p.price)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <div className="mt-3 pt-3 border-t space-y-1" style={{ borderColor: "#ded5d1" }}>
                 <div className="flex justify-between text-xs">
                   <span style={{ color: "#bba8a1" }}>{t.shippingLabel}</span>
@@ -269,32 +310,71 @@ export default function OrderModal({
             <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#bba8a1" }}>
               {t.recap}
             </p>
-            <div className="space-y-1.5">
-              {selectedOffers.map((o) => (
-                <div key={o.id} className="flex justify-between text-xs">
-                  <span className="flex-1 truncate pr-2">
-                    {lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}
-                  </span>
-                  <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
+            {isAdmin ? (
+              <>
+                <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#bba8a1" }}>Produits payants</p>
+                <div className="space-y-1.5 mb-3">
+                  {selectedOffers.map((o) => (
+                    <div key={o.id} className="flex justify-between text-xs">
+                      <span className="flex-1 truncate pr-2">{lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}</span>
+                      <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
+                    </div>
+                  ))}
+                  {selectedProducts.filter((p) => (quantities[p.ref] || 0) > 0).map((p) => {
+                    const qty = quantities[p.ref] || 0;
+                    return (
+                      <div key={p.ref} className="flex justify-between text-xs">
+                        <span className="flex-1 truncate pr-2">{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}</span>
+                        <span className="font-semibold">{formatCHF(qty * p.price)}</span>
+                      </div>
+                    );
+                  })}
+                  {selectedOffers.length === 0 && selectedProducts.filter((p) => (quantities[p.ref] || 0) > 0).length === 0 && (
+                    <p className="text-xs italic" style={{ color: "#bba8a1" }}>Aucun produit payant</p>
+                  )}
                 </div>
-              ))}
-              {selectedProducts.map((p) => {
-                const qty = quantities[p.ref] || 0;
-                const paid = isAdmin ? qty : (p.promoEligible ? calcPromo(qty).paid : qty);
-                const free = isAdmin ? (freeQuantities?.[p.ref] || 0) : (p.promoEligible ? calcPromo(qty).free : 0);
-                return (
-                  <div key={p.ref} className="flex justify-between text-xs">
-                    <span className="flex-1 truncate pr-2">
-                      {lang === "de" ? p.nameDe : p.nameFr}
-                      {p.size ? ` (${p.size})` : ""}
-                      {paid > 0 && <> ×{paid}</>}
-                      {free > 0 && <span style={{ color: "#d598aa" }}> +{free} offert{free > 1 ? "s" : ""}</span>}
-                    </span>
-                    <span className="font-semibold">{paid > 0 ? formatCHF(paid * p.price) : <span style={{ color: "#d598aa" }}>Offert</span>}</span>
+                {selectedProducts.some((p) => (freeQuantities?.[p.ref] || 0) > 0) && (
+                  <>
+                    <div className="border-t pt-3 mb-1.5" style={{ borderColor: "#f0ebe9" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#d598aa" }}>Produits offerts</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {selectedProducts.filter((p) => (freeQuantities?.[p.ref] || 0) > 0).map((p) => {
+                        const free = freeQuantities?.[p.ref] || 0;
+                        return (
+                          <div key={p.ref} className="flex justify-between text-xs">
+                            <span className="flex-1 truncate pr-2" style={{ color: "#d598aa" }}>{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{free}</span>
+                            <span className="font-semibold" style={{ color: "#d598aa" }}>Offert</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="space-y-1.5">
+                {selectedOffers.map((o) => (
+                  <div key={o.id} className="flex justify-between text-xs">
+                    <span className="flex-1 truncate pr-2">{lang === "de" ? o.nameDe : o.nameFr} ×{offerQtys[o.id]}</span>
+                    <span className="font-semibold">{formatCHF(offerQtys[o.id] * o.price)}</span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+                {selectedProducts.map((p) => {
+                  const qty = quantities[p.ref] || 0;
+                  const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+                  return (
+                    <div key={p.ref} className="flex justify-between text-xs">
+                      <span className="flex-1 truncate pr-2">
+                        {lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}
+                        {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
+                      </span>
+                      <span className="font-semibold">{formatCHF(paid * p.price)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <div className="mt-3 pt-3 border-t space-y-1" style={{ borderColor: "#ded5d1" }}>
               <div className="flex justify-between text-xs">
                 <span style={{ color: "#bba8a1" }}>{t.sousTotal}</span>
