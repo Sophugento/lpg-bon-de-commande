@@ -8,6 +8,25 @@ import { T, Lang } from "@/lib/i18n";
 import QuantitySelector from "./QuantitySelector";
 import ProductInfoModal from "./ProductInfoModal";
 
+function StatusBadge({ status, t }: { status?: string; t: T }) {
+  if (!status || status === "") return null;
+  const config: Record<string, { label: string; bg: string; color: string }> = {
+    "new":              { label: t.statusNew,    bg: "#d598aa", color: "#fff" },
+    "indisponible":     { label: t.statusIndispo, bg: "#e0dbd8", color: "#7a6e6a" },
+    "rupture de stock": { label: t.statusRupture, bg: "#f5e4c0", color: "#8a6000" },
+  };
+  const c = config[status];
+  if (!c) return null;
+  return (
+    <span
+      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block ml-1"
+      style={{ backgroundColor: c.bg, color: c.color }}
+    >
+      {c.label}
+    </span>
+  );
+}
+
 interface Props {
   baseName: string;
   baseNameDe: string;
@@ -70,14 +89,19 @@ export default function SizeVariantCard({
                 className="px-4 py-2.5"
                 style={idx < products.length - 1 ? { borderBottom: "1px solid #f0ebe9" } : {}}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-semibold w-14 shrink-0" style={{ color: "#bba8a1" }}>
                     {p.size}
                   </span>
                   <span className="text-sm font-bold shrink-0 w-20 whitespace-nowrap" style={{ color: "#2d2020" }}>
                     {formatCHF(p.price)}
                   </span>
-                  <QuantitySelector value={qty} onChange={(v) => onChange(p.ref, v)} />
+                  <QuantitySelector
+                    value={qty}
+                    onChange={(v) => onChange(p.ref, v)}
+                    disabled={p.status === "indisponible" || p.status === "rupture de stock"}
+                  />
+                  <StatusBadge status={p.status} t={t} />
                 </div>
                 {qty > 0 && (
                   <p className="text-xs font-semibold mt-1 pl-16" style={{ color: "#d598aa" }}>

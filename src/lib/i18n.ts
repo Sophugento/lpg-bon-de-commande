@@ -59,6 +59,11 @@ export const TRANSLATIONS = {
     priceNote: "HT",
     prixVente: "Prix vente :",
 
+    // Statuts produit
+    statusNew: "Nouveau",
+    statusIndispo: "Indisponible",
+    statusRupture: "Rupture de stock",
+
     // Promo
     promoLabel: (n: number, code: string) => `🎁 +${n} offert${n > 1 ? "s" : ""} (${code})`,
     minQtyWarning: "Min. 3 pièces requis",
@@ -156,6 +161,11 @@ export const TRANSLATIONS = {
     htNote: "Alle Preise sind Nettopreise (exkl. MwSt.)",
     priceNote: "netto",
     prixVente: "Verkaufspreis:",
+
+    // Statuts produit
+    statusNew: "Neu",
+    statusIndispo: "Nicht verfügbar",
+    statusRupture: "Nicht vorrätig",
 
     promoLabel: (n: number, code: string) => `🎁 +${n} geschenkt (${code})`,
     minQtyWarning: "Mind. 3 Stück erforderlich",

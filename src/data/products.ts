@@ -1,5 +1,7 @@
 export type ProductType = "revente" | "professionnel" | "recharge";
 
+export type ProductStatus = "new" | "indisponible" | "rupture de stock" | "";
+
 export interface Product {
   ref: string;
   nameFr: string;
@@ -11,6 +13,7 @@ export interface Product {
   category: string;
   subcategory: string;
   promoEligible: boolean;
+  status?: ProductStatus;
 }
 
 export interface Offer {

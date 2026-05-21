@@ -17,6 +17,25 @@ interface Props {
   productInfo: Record<string, ProductInfo>;
 }
 
+function StatusBadge({ status, t }: { status?: string; t: T }) {
+  if (!status || status === "") return null;
+  const config: Record<string, { label: string; bg: string; color: string }> = {
+    "new":              { label: t.statusNew,     bg: "#d598aa", color: "#fff" },
+    "indisponible":     { label: t.statusIndispo,  bg: "#e0dbd8", color: "#7a6e6a" },
+    "rupture de stock": { label: t.statusRupture,  bg: "#f5e4c0", color: "#8a6000" },
+  };
+  const c = config[status];
+  if (!c) return null;
+  return (
+    <span
+      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block"
+      style={{ backgroundColor: c.bg, color: c.color }}
+    >
+      {c.label}
+    </span>
+  );
+}
+
 export default function ProductPairCard({ products, quantities, onChange, t, lang, productInfo }: Props) {
   const [showInfo, setShowInfo] = useState(false);
 
@@ -74,14 +93,17 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
               className="flex-1 px-3 py-3"
               style={isPair ? { borderRight: "1px solid #f0ebe9" } : {}}
             >
-              {(isPair || !hasCabine) && (
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
-                  style={{ backgroundColor: "#d598aa" }}
-                >
-                  {t.revente}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                {(isPair || !hasCabine) && (
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block"
+                    style={{ backgroundColor: "#d598aa" }}
+                  >
+                    {t.revente}
+                  </span>
+                )}
+                <StatusBadge status={revente.status} t={t} />
+              </div>
               <p className="text-xs" style={{ color: "#bba8a1" }}>
                 {translateSize(revente.size, lang)}
               </p>
@@ -95,7 +117,11 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
               ) : (
                 <div className="mb-2 h-4" />
               )}
-              <QuantitySelector value={reventeQty} onChange={(v) => onChange(revente.ref, v)} />
+              <QuantitySelector
+                value={reventeQty}
+                onChange={(v) => onChange(revente.ref, v)}
+                disabled={revente.status === "indisponible" || revente.status === "rupture de stock"}
+              />
               {reventeQty > 0 && (
                 <div className="mt-1.5 space-y-0.5">
                   <p className="text-xs font-semibold" style={{ color: "#d598aa" }}>
@@ -124,14 +150,17 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
             const bgColor = recharge ? "#e8c0cc" : "#bba8a1";
             return (
               <div className="flex-1 px-3 py-3" style={{ backgroundColor: "#faf9f8" }}>
-                {(isPair || !hasRevente) && (
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block mb-2"
-                    style={{ backgroundColor: bgColor }}
-                  >
-                    {typeLabel}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                  {(isPair || !hasRevente) && (
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      {typeLabel}
+                    </span>
+                  )}
+                  <StatusBadge status={prod.status} t={t} />
+                </div>
                 <p className="text-xs" style={{ color: "#bba8a1" }}>
                   {translateSize(prod.size, lang)}
                 </p>
@@ -139,7 +168,11 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                   {formatCHF(prod.price)}
                 </p>
                 <div className="mb-2 h-4" />
-                <QuantitySelector value={qty} onChange={(v) => onChange(prod.ref, v)} />
+                <QuantitySelector
+                  value={qty}
+                  onChange={(v) => onChange(prod.ref, v)}
+                  disabled={prod.status === "indisponible" || prod.status === "rupture de stock"}
+                />
                 {qty > 0 && (
                   <p className="text-xs font-semibold mt-1.5" style={{ color: "#bba8a1" }}>
                     = {formatCHF(qty * prod.price)}
