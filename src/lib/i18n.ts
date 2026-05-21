@@ -60,7 +60,7 @@ export const TRANSLATIONS = {
     prixVente: "Prix vente :",
 
     // Statuts produit
-    statusNew: "Nouveau",
+    statusNew: "New",
     statusIndispo: "Indisponible",
     statusRupture: "Rupture de stock",
 
@@ -163,7 +163,7 @@ export const TRANSLATIONS = {
     prixVente: "Verkaufspreis:",
 
     // Statuts produit
-    statusNew: "Neu",
+    statusNew: "New",
     statusIndispo: "Nicht verfügbar",
     statusRupture: "Nicht vorrätig",
 
