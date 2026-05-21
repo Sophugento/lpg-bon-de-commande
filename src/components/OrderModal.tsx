@@ -279,16 +279,18 @@ export default function OrderModal({
                 </div>
               ))}
               {selectedProducts.map((p) => {
-                const qty = quantities[p.ref];
-                const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+                const qty = quantities[p.ref] || 0;
+                const paid = isAdmin ? qty : (p.promoEligible ? calcPromo(qty).paid : qty);
+                const free = isAdmin ? (freeQuantities?.[p.ref] || 0) : (p.promoEligible ? calcPromo(qty).free : 0);
                 return (
                   <div key={p.ref} className="flex justify-between text-xs">
                     <span className="flex-1 truncate pr-2">
                       {lang === "de" ? p.nameDe : p.nameFr}
-                      {p.size ? ` (${p.size})` : ""} ×{qty}
-                      {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
+                      {p.size ? ` (${p.size})` : ""}
+                      {paid > 0 && <> ×{paid}</>}
+                      {free > 0 && <span style={{ color: "#d598aa" }}> +{free} offert{free > 1 ? "s" : ""}</span>}
                     </span>
-                    <span className="font-semibold">{formatCHF(paid * p.price)}</span>
+                    <span className="font-semibold">{paid > 0 ? formatCHF(paid * p.price) : <span style={{ color: "#d598aa" }}>Offert</span>}</span>
                   </div>
                 );
               })}
