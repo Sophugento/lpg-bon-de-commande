@@ -15,6 +15,9 @@ interface Props {
   t: T;
   lang: Lang;
   productInfo: Record<string, ProductInfo>;
+  isAdmin?: boolean;
+  freeQuantities?: Record<string, number>;
+  onFreeQtyChange?: (ref: string, qty: number) => void;
 }
 
 type CardGroup =
@@ -71,7 +74,7 @@ function groupBySubcategory(products: Product[]): Record<string, Product[]> {
   }, {} as Record<string, Product[]>);
 }
 
-export default function CategorySection({ category, products, quantities, onChange, t, lang, productInfo }: Props) {
+export default function CategorySection({ category, products, quantities, onChange, t, lang, productInfo, isAdmin, freeQuantities, onFreeQtyChange }: Props) {
   const [open, setOpen] = useState(false);
   const activeCount = products.filter((p) => (quantities[p.ref] || 0) > 0).length;
   const grouped = useMemo(() => groupBySubcategory(products), [products]);
@@ -132,6 +135,9 @@ export default function CategorySection({ category, products, quantities, onChan
                     t={t}
                     lang={lang}
                     productInfo={productInfo}
+                    isAdmin={isAdmin}
+                    freeQuantities={freeQuantities}
+                    onFreeQtyChange={onFreeQtyChange}
                   />
                 ) : (
                   <ProductPairCard
@@ -142,6 +148,9 @@ export default function CategorySection({ category, products, quantities, onChan
                     t={t}
                     lang={lang}
                     productInfo={productInfo}
+                    isAdmin={isAdmin}
+                    freeQuantities={freeQuantities}
+                    onFreeQtyChange={onFreeQtyChange}
                   />
                 )
               )}

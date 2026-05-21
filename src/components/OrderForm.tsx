@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { calcPromo } from "@/lib/utils";
 import { TRANSLATIONS, Lang } from "@/lib/i18n";
 import CategorySection from "@/components/CategorySection";
 import OfferRow from "@/components/OfferRow";
 import OrderBar from "@/components/OrderBar";
 import OrderModal from "@/components/OrderModal";
+import AdminLoginModal from "@/components/AdminLoginModal";
 import { Catalog } from "@/lib/catalog";
 
 interface Props {
@@ -20,6 +21,13 @@ export default function OrderForm({ catalog }: Props) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [offerQtys, setOfferQtys] = useState<Record<string, number>>({});
   const [modalOpen, setModalOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [freeQuantities, setFreeQuantities] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    setIsAdmin(sessionStorage.getItem("lpg_admin") === "1");
+  }, []);
 
   const t = TRANSLATIONS[lang];
 
@@ -31,11 +39,27 @@ export default function OrderForm({ catalog }: Props) {
     setOfferQtys((q) => ({ ...q, [id]: qty }));
   }
 
+  function handleAdminLogin() {
+    sessionStorage.setItem("lpg_admin", "1");
+    setIsAdmin(true);
+    setShowAdminLogin(false);
+  }
+
+  function handleAdminLogout() {
+    sessionStorage.removeItem("lpg_admin");
+    setIsAdmin(false);
+    setFreeQuantities({});
+  }
+
+  function updateFreeQty(ref: string, qty: number) {
+    setFreeQuantities((q) => ({ ...q, [ref]: qty }));
+  }
+
   const subtotal = useMemo(() => {
     const productTotal = products.reduce((sum, p) => {
       const qty = quantities[p.ref] || 0;
       if (qty === 0) return sum;
-      const { paid } = p.promoEligible ? calcPromo(qty) : { paid: qty };
+      const paid = isAdmin || !p.promoEligible ? qty : calcPromo(qty).paid;
       return sum + paid * p.price;
     }, 0);
     const offerTotal = offers.reduce(
@@ -43,7 +67,7 @@ export default function OrderForm({ catalog }: Props) {
       0
     );
     return Math.round((productTotal + offerTotal) * 100) / 100;
-  }, [quantities, offerQtys, products, offers]);
+  }, [quantities, offerQtys, products, offers, isAdmin]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
@@ -72,6 +96,15 @@ export default function OrderForm({ catalog }: Props) {
             {t.title}
           </h1>
         </div>
+        <div className="flex items-center">
+          <button
+            onClick={() => isAdmin ? handleAdminLogout() : setShowAdminLogin(true)}
+            className="mr-2 w-7 h-7 flex items-center justify-center rounded-full text-sm transition-colors"
+            style={{ backgroundColor: isAdmin ? "#2d2020" : "transparent", color: isAdmin ? "white" : "#bba8a1" }}
+            title={isAdmin ? "Déconnexion admin" : "Accès admin"}
+          >
+            🔑
+          </button>
         <div
           className="flex rounded-lg overflow-hidden border text-xs font-semibold"
           style={{ borderColor: "#ded5d1" }}
@@ -97,7 +130,15 @@ export default function OrderForm({ catalog }: Props) {
             DE
           </button>
         </div>
+        </div>
       </header>
+
+      {isAdmin && (
+        <div className="mx-4 mt-4 rounded-xl px-3 py-2 flex items-center justify-between text-xs" style={{ backgroundColor: "#2d2020", color: "white" }}>
+          <span className="font-semibold">🔑 Mode Admin — Quantités manuelles activées</span>
+          <button onClick={handleAdminLogout} className="underline opacity-70">Déconnexion</button>
+        </div>
+      )}
 
       {/* Règles */}
       <div
@@ -113,8 +154,8 @@ export default function OrderForm({ catalog }: Props) {
         <p style={{ color: "#8a5565" }}>
           • {t.ruleShipping} <strong>20 CHF</strong> {t.ruleShippingDetail}
         </p>
-        <p style={{ color: "#8a5565" }}>• {t.rulePromo}</p>
-        <p style={{ color: "#8a5565" }}>• {t.ruleMinQty}</p>
+        {!isAdmin && <p style={{ color: "#8a5565" }}>• {t.rulePromo}</p>}
+        {!isAdmin && <p style={{ color: "#8a5565" }}>• {t.ruleMinQty}</p>}
         <p className="pt-1 font-semibold" style={{ color: "#bf7585" }}>
           ⚠️ {t.htNote}
         </p>
@@ -156,6 +197,9 @@ export default function OrderForm({ catalog }: Props) {
             t={t}
             lang={lang}
             productInfo={productInfo}
+            isAdmin={isAdmin}
+            freeQuantities={freeQuantities}
+            onFreeQtyChange={updateFreeQty}
           />
         ))}
       </div>
@@ -173,7 +217,13 @@ export default function OrderForm({ catalog }: Props) {
           subtotal={subtotal}
           t={t}
           lang={lang}
+          isAdmin={isAdmin}
+          freeQuantities={freeQuantities}
         />
+      )}
+
+      {showAdminLogin && (
+        <AdminLoginModal onSuccess={handleAdminLogin} onClose={() => setShowAdminLogin(false)} />
       )}
     </main>
   );

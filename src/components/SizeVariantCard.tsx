@@ -36,6 +36,9 @@ interface Props {
   t: T;
   lang: Lang;
   productInfo: Record<string, ProductInfo>;
+  isAdmin?: boolean;
+  freeQuantities?: Record<string, number>;
+  onFreeQtyChange?: (ref: string, qty: number) => void;
 }
 
 export default function SizeVariantCard({
@@ -47,6 +50,9 @@ export default function SizeVariantCard({
   t,
   lang,
   productInfo,
+  isAdmin,
+  freeQuantities,
+  onFreeQtyChange,
 }: Props) {
   const [showInfo, setShowInfo] = useState(false);
 
@@ -97,11 +103,31 @@ export default function SizeVariantCard({
                   <span className="text-sm font-bold shrink-0 w-20 whitespace-nowrap" style={{ color: "#2d2020" }}>
                     {formatCHF(p.price)}
                   </span>
-                  <QuantitySelector
-                    value={qty}
-                    onChange={(v) => onChange(p.ref, v)}
-                    disabled={p.status === "indisponible" || p.status === "rupture de stock"}
-                  />
+                  {isAdmin ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-semibold w-12" style={{ color: "#bba8a1" }}>Payant</span>
+                        <QuantitySelector
+                          value={qty}
+                          onChange={(v) => onChange(p.ref, v)}
+                          disabled={p.status === "indisponible" || p.status === "rupture de stock"}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-semibold w-12" style={{ color: "#d598aa" }}>Offert</span>
+                        <QuantitySelector
+                          value={freeQuantities?.[p.ref] || 0}
+                          onChange={(v) => onFreeQtyChange?.(p.ref, v)}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <QuantitySelector
+                      value={qty}
+                      onChange={(v) => onChange(p.ref, v)}
+                      disabled={p.status === "indisponible" || p.status === "rupture de stock"}
+                    />
+                  )}
                   <StatusBadge status={p.status} t={t} />
                 </div>
                 {qty > 0 && (

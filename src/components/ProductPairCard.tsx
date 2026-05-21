@@ -15,6 +15,9 @@ interface Props {
   t: T;
   lang: Lang;
   productInfo: Record<string, ProductInfo>;
+  isAdmin?: boolean;
+  freeQuantities?: Record<string, number>;
+  onFreeQtyChange?: (ref: string, qty: number) => void;
 }
 
 function StatusBadge({ status, t }: { status?: string; t: T }) {
@@ -36,7 +39,7 @@ function StatusBadge({ status, t }: { status?: string; t: T }) {
   );
 }
 
-export default function ProductPairCard({ products, quantities, onChange, t, lang, productInfo }: Props) {
+export default function ProductPairCard({ products, quantities, onChange, t, lang, productInfo, isAdmin, freeQuantities, onFreeQtyChange }: Props) {
   const [showInfo, setShowInfo] = useState(false);
 
   const revente = products.find((p) => p.type === "revente");
@@ -117,27 +120,47 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
               ) : (
                 <div className="mb-2 h-4" />
               )}
-              <QuantitySelector
-                value={reventeQty}
-                onChange={(v) => onChange(revente.ref, v)}
-                disabled={revente.status === "indisponible" || revente.status === "rupture de stock"}
-              />
-              {reventeQty > 0 && (
-                <div className="mt-1.5 space-y-0.5">
-                  <p className="text-xs font-semibold" style={{ color: "#d598aa" }}>
-                    = {formatCHF(reventePaid * revente.price)}
-                  </p>
-                  {revente.promoEligible && reventeFree > 0 && (
-                    <p className="text-[10px]" style={{ color: "#d598aa" }}>
-                      {t.promoLabel(reventeFree, reventeQty >= 10 ? "10+2" : "6+1")}
-                    </p>
-                  )}
-                  {revente.promoEligible && reventeQty < 3 && reventeQty > 0 && (
-                    <p className="text-[10px]" style={{ color: "#bf7585" }}>
-                      {t.minQtyWarning}
+              {isAdmin ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-semibold w-12" style={{ color: "#bba8a1" }}>Payant</span>
+                    <QuantitySelector value={reventeQty} onChange={(v) => onChange(revente.ref, v)} disabled={revente.status === "indisponible" || revente.status === "rupture de stock"} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-semibold w-12" style={{ color: "#d598aa" }}>Offert</span>
+                    <QuantitySelector value={freeQuantities?.[revente.ref] || 0} onChange={(v) => onFreeQtyChange?.(revente.ref, v)} />
+                  </div>
+                  {reventeQty > 0 && (
+                    <p className="text-xs font-semibold" style={{ color: "#d598aa" }}>
+                      = {formatCHF(reventeQty * revente.price)}
                     </p>
                   )}
                 </div>
+              ) : (
+                <>
+                  <QuantitySelector
+                    value={reventeQty}
+                    onChange={(v) => onChange(revente.ref, v)}
+                    disabled={revente.status === "indisponible" || revente.status === "rupture de stock"}
+                  />
+                  {reventeQty > 0 && (
+                    <div className="mt-1.5 space-y-0.5">
+                      <p className="text-xs font-semibold" style={{ color: "#d598aa" }}>
+                        = {formatCHF(reventePaid * revente.price)}
+                      </p>
+                      {revente.promoEligible && reventeFree > 0 && (
+                        <p className="text-[10px]" style={{ color: "#d598aa" }}>
+                          {t.promoLabel(reventeFree, reventeQty >= 10 ? "10+2" : "6+1")}
+                        </p>
+                      )}
+                      {revente.promoEligible && reventeQty < 3 && reventeQty > 0 && (
+                        <p className="text-[10px]" style={{ color: "#bf7585" }}>
+                          {t.minQtyWarning}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}

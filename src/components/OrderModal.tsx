@@ -36,6 +36,8 @@ interface Props {
   subtotal: number;
   t: T;
   lang: Lang;
+  isAdmin?: boolean;
+  freeQuantities?: Record<string, number>;
 }
 
 const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
@@ -50,6 +52,8 @@ export default function OrderModal({
   subtotal,
   t,
   lang,
+  isAdmin,
+  freeQuantities,
 }: Props) {
   const [c, setC] = useState<ContactInfo>({
     firstName: "",
@@ -115,7 +119,15 @@ export default function OrderModal({
       })),
       ...selectedProducts.map((p) => {
         const qty = quantities[p.ref];
-        const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+        let paid: number, free: number;
+        if (isAdmin) {
+          paid = qty;
+          free = freeQuantities?.[p.ref] || 0;
+        } else {
+          const promo = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+          paid = promo.paid;
+          free = promo.free;
+        }
         return {
           ref: p.ref,
           name: lang === "de" ? p.nameDe : p.nameFr,
@@ -188,7 +200,8 @@ export default function OrderModal({
                 ))}
                 {selectedProducts.map((p) => {
                   const qty = quantities[p.ref];
-                  const { paid, free } = p.promoEligible ? calcPromo(qty) : { paid: qty, free: 0 };
+                  const paid = isAdmin ? qty : (p.promoEligible ? calcPromo(qty).paid : qty);
+                  const free = isAdmin ? (freeQuantities?.[p.ref] || 0) : (p.promoEligible ? calcPromo(qty).free : 0);
                   return (
                     <div key={p.ref} className="flex justify-between text-xs">
                       <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
