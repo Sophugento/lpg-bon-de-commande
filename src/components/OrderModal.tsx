@@ -68,6 +68,7 @@ export default function OrderModal({
     sameDelivery: true,
     delivery: { ...EMPTY_DELIVERY },
   });
+  const [salesEmail, setSalesEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -75,7 +76,9 @@ export default function OrderModal({
   const total = subtotal + shipping;
   const totalTTC = total * 1.081;
 
-  const selectedProducts = products.filter((p) => (quantities[p.ref] || 0) > 0);
+  const selectedProducts = isAdmin
+    ? products.filter((p) => (quantities[p.ref] || 0) > 0 || (freeQuantities?.[p.ref] || 0) > 0)
+    : products.filter((p) => (quantities[p.ref] || 0) > 0);
   const selectedOffers = offers.filter((o) => (offerQtys[o.id] || 0) > 0);
 
   function upd<K extends keyof ContactInfo>(field: K, val: ContactInfo[K]) {
@@ -153,6 +156,7 @@ export default function OrderModal({
           contact: c,
           deliveryAddress,
           orderLines,
+          salesEmail: isAdmin && salesEmail.trim() ? salesEmail.trim() : undefined,
           subtotal,
           shipping,
           total,
@@ -199,17 +203,18 @@ export default function OrderModal({
                   </div>
                 ))}
                 {selectedProducts.map((p) => {
-                  const qty = quantities[p.ref];
+                  const qty = quantities[p.ref] || 0;
                   const paid = isAdmin ? qty : (p.promoEligible ? calcPromo(qty).paid : qty);
                   const free = isAdmin ? (freeQuantities?.[p.ref] || 0) : (p.promoEligible ? calcPromo(qty).free : 0);
                   return (
                     <div key={p.ref} className="flex justify-between text-xs">
                       <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>
                         {lang === "de" ? p.nameDe : p.nameFr}
-                        {p.size ? ` (${p.size})` : ""} ×{qty}
-                        {free > 0 && <span style={{ color: "#d598aa" }}> +{free}</span>}
+                        {p.size ? ` (${p.size})` : ""}
+                        {paid > 0 && <> ×{paid}</>}
+                        {free > 0 && <span style={{ color: "#d598aa" }}> +{free} offert{free > 1 ? "s" : ""}</span>}
                       </span>
-                      <span className="font-semibold">{formatCHF(paid * p.price)}</span>
+                      <span className="font-semibold">{paid > 0 ? formatCHF(paid * p.price) : <span style={{ color: "#d598aa" }}>Offert</span>}</span>
                     </div>
                   );
                 })}
@@ -326,6 +331,15 @@ export default function OrderModal({
           </div>
           <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
           <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
+
+          {isAdmin && (
+            <Field
+              label="Votre e-mail (commerciale) — reçoit la confirmation en copie"
+              type="email"
+              value={salesEmail}
+              onChange={setSalesEmail}
+            />
+          )}
 
           {/* Adresse livraison */}
           <div

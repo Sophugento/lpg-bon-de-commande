@@ -37,6 +37,7 @@ interface OrderPayload {
   contact: ContactInfo;
   deliveryAddress: Address;
   orderLines: OrderLine[];
+  salesEmail?: string;
   subtotal: number;
   shipping: number;
   total: number;
@@ -272,7 +273,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
 
 export async function POST(req: NextRequest) {
   const payload: OrderPayload = await req.json();
-  const { contact, orderLines, lang } = payload;
+  const { contact, orderLines, lang, salesEmail } = payload;
 
   if (!contact.email || !contact.firstName || orderLines.length === 0) {
     return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
@@ -305,6 +306,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         from: "LPG Switzerland <commandes@lpgswitzerland.com>",
         to: [toEmail],
+        ...(salesEmail ? { cc: [salesEmail] } : {}),
         reply_to: contact.email,
         subject,
         html,
