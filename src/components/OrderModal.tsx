@@ -121,7 +121,7 @@ export default function OrderModal({
         gift: o.gift,
       })),
       ...selectedProducts.map((p) => {
-        const qty = quantities[p.ref];
+        const qty = quantities[p.ref] || 0;
         let paid: number, free: number;
         if (isAdmin) {
           paid = qty;
@@ -136,7 +136,7 @@ export default function OrderModal({
           name: lang === "de" ? p.nameDe : p.nameFr,
           type: p.type,
           size: p.size,
-          qty,
+          qty: paid + free,
           unitPrice: p.price,
           freeQty: free,
           lineTotal: paid * p.price,
@@ -384,8 +384,8 @@ export default function OrderModal({
             disabled={!isValid || status === "sending"}
             className="w-full py-3.5 rounded-xl text-sm font-semibold text-white mt-2 mb-2"
             style={{
-              backgroundColor: isValid && status === "idle" ? "#d598aa" : "#ded5d1",
-              cursor: isValid && status === "idle" ? "pointer" : "not-allowed",
+              backgroundColor: isValid && status !== "sending" ? "#d598aa" : "#ded5d1",
+              cursor: isValid && status !== "sending" ? "pointer" : "not-allowed",
             }}
           >
             {status === "sending" ? t.btnSending : t.btnConfirm}
