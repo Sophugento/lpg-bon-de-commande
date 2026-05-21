@@ -157,6 +157,7 @@ export default function OrderModal({
           deliveryAddress,
           orderLines,
           salesEmail: isAdmin && salesEmail.trim() ? salesEmail.trim() : undefined,
+          isAdmin: isAdmin || false,
           subtotal,
           shipping,
           total,

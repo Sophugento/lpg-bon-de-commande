@@ -38,6 +38,7 @@ interface OrderPayload {
   deliveryAddress: Address;
   orderLines: OrderLine[];
   salesEmail?: string;
+  isAdmin?: boolean;
   subtotal: number;
   shipping: number;
   total: number;
@@ -49,7 +50,7 @@ function chf(n: number) {
 }
 
 function buildHtml(payload: OrderPayload): string {
-  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, lang } = payload;
+  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, lang, isAdmin } = payload;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit",
     month: "2-digit",
@@ -73,7 +74,16 @@ function buildHtml(payload: OrderPayload): string {
     return "";
   };
 
-  const rows = orderLines.map((l) => {
+  const tableHead = `
+    <thead><tr style="background:#f7f4f3">
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.ref}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700">${labels.qty}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.unit}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.total}</th>
+    </tr></thead>`;
+
+  const makeRow = (l: OrderLine, qtyDisplay: number | string, totalDisplay: string, dimmed = false) => {
     const tl = typeLabel(l.type);
     const detail = [tl, l.size].filter(Boolean).join(" – ");
     const descHtml = l.type === "offre" && (l.description || l.gift)
@@ -82,12 +92,37 @@ function buildHtml(payload: OrderPayload): string {
     return `
     <tr style="border-bottom:1px solid #f0ebe9">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:13px">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:center">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:right">${chf(l.unitPrice)}</td>
-      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right">${chf(l.lineTotal)}</td>
+      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#d598aa;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:center;${dimmed ? "color:#d598aa;" : ""}">${qtyDisplay}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:right">${dimmed ? "" : chf(l.unitPrice)}</td>
+      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;${dimmed ? "color:#d598aa;" : ""}">${totalDisplay}</td>
     </tr>`;
-  }).join("");
+  };
+
+  let orderTableHtml: string;
+  if (isAdmin) {
+    const paidLines = orderLines.filter((l) => (l.qty - l.freeQty) > 0);
+    const freeLines = orderLines.filter((l) => l.freeQty > 0);
+    const paidRows = paidLines.map((l) => makeRow(l, l.qty - l.freeQty, chf(l.lineTotal))).join("");
+    const freeRows = freeLines.map((l) => makeRow(l, l.freeQty, lang === "de" ? "Gratis" : "Offert", true)).join("");
+    orderTableHtml = `
+      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Bezahlte Produkte" : "Produits payants"}</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden;margin-bottom:20px">
+        ${tableHead}<tbody>${paidLines.length ? paidRows : `<tr><td colspan="5" style="padding:12px 8px;font-size:12px;color:#bba8a1;font-style:italic">${lang === "de" ? "Keine bezahlten Produkte" : "Aucun produit payant"}</td></tr>`}</tbody>
+      </table>
+      ${freeLines.length ? `
+      <h2 style="font-size:11px;color:#d598aa;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #f0cad6;border-radius:8px;overflow:hidden">
+        ${tableHead}<tbody>${freeRows}</tbody>
+      </table>` : ""}`;
+  } else {
+    const rows = orderLines.map((l) => makeRow(l, `${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}`, chf(l.lineTotal))).join("");
+    orderTableHtml = `
+      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
+        ${tableHead}<tbody>${rows}</tbody>
+      </table>`;
+  }
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -109,19 +144,7 @@ function buildHtml(payload: OrderPayload): string {
         ${deliveryHtml}
       </table>
 
-      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
-        <thead>
-          <tr style="background:#f7f4f3">
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.ref}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700">${labels.qty}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.unit}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.total}</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+      ${orderTableHtml}
 
       <table style="width:100%;border-collapse:collapse;margin-top:16px">
         <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.subtotal}</td><td style="font-size:13px;text-align:right">${chf(subtotal)}</td></tr>
