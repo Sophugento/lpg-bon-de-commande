@@ -217,7 +217,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
         </table>
 
         <!-- Section title -->
-        <p style="margin:0 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
+        <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
 
         <!-- Products table -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
