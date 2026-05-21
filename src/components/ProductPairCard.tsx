@@ -197,15 +197,35 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                 ) : (
                   <div className="mb-2 h-4" />
                 )}
-                <QuantitySelector
-                  value={qty}
-                  onChange={(v) => onChange(prod.ref, v)}
-                  disabled={prod.status === "indisponible" || prod.status === "rupture de stock"}
-                />
-                {qty > 0 && (
-                  <p className="text-xs font-semibold mt-1.5" style={{ color: "#bba8a1" }}>
-                    = {formatCHF(qty * prod.price)}
-                  </p>
+                {isAdmin ? (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-semibold w-12" style={{ color: "#bba8a1" }}>Payant</span>
+                      <QuantitySelector value={qty} onChange={(v) => onChange(prod.ref, v)} disabled={prod.status === "indisponible" || prod.status === "rupture de stock"} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-semibold w-12" style={{ color: "#d598aa" }}>Offert</span>
+                      <QuantitySelector value={freeQuantities?.[prod.ref] || 0} onChange={(v) => onFreeQtyChange?.(prod.ref, v)} />
+                    </div>
+                    {qty > 0 && (
+                      <p className="text-xs font-semibold" style={{ color: "#bba8a1" }}>
+                        = {formatCHF(qty * prod.price)}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <QuantitySelector
+                      value={qty}
+                      onChange={(v) => onChange(prod.ref, v)}
+                      disabled={prod.status === "indisponible" || prod.status === "rupture de stock"}
+                    />
+                    {qty > 0 && (
+                      <p className="text-xs font-semibold mt-1.5" style={{ color: "#bba8a1" }}>
+                        = {formatCHF(qty * prod.price)}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             );
