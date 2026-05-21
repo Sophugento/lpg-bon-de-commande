@@ -164,7 +164,7 @@ function buildHtml(payload: OrderPayload): string {
 }
 
 function buildConfirmHtml(payload: OrderPayload): string {
-  const { contact, orderLines, subtotal, shipping, total, lang } = payload;
+  const { contact, orderLines, subtotal, shipping, total, lang, isAdmin } = payload;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit", month: "2-digit", year: "numeric",
   });
@@ -196,13 +196,51 @@ function buildConfirmHtml(payload: OrderPayload): string {
     },
   }[lang];
 
-  const rows = orderLines.map((l) => `
+  const confirmHead = `
+    <tr bgcolor="#f7f4f3">
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700;font-family:Arial,sans-serif">${labels.product}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700;font-family:Arial,sans-serif">${labels.qty}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.unit}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.total}</th>
+    </tr>`;
+
+  const makeConfirmRow = (l: OrderLine, qtyDisplay: string, unitDisplay: string, totalDisplay: string, pink = false) => `
     <tr>
-      <td style="padding:8px;font-size:13px;color:#2d2020;border-bottom:1px solid #f0ebe9">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
-      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
-      <td style="padding:8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.unitPrice)}</td>
-      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.lineTotal)}</td>
-    </tr>`).join("");
+      <td style="padding:8px;font-size:13px;color:${pink ? "#d598aa" : "#2d2020"};border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
+      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9;color:${pink ? "#d598aa" : "inherit"};font-family:Arial,sans-serif">${qtyDisplay}</td>
+      <td style="padding:8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;font-family:Arial,sans-serif">${unitDisplay}</td>
+      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;color:${pink ? "#d598aa" : "inherit"};font-family:Arial,sans-serif">${totalDisplay}</td>
+    </tr>`;
+
+  let productTablesHtml: string;
+  if (isAdmin) {
+    const paidLines = orderLines.filter((l) => (l.qty - l.freeQty) > 0);
+    const freeLines = orderLines.filter((l) => l.freeQty > 0);
+    const paidRows = paidLines.map((l) => makeConfirmRow(l, String(l.qty - l.freeQty), chf(l.unitPrice), chf(l.lineTotal))).join("");
+    const freeRows = freeLines.map((l) => makeConfirmRow(l, String(l.freeQty), "", lang === "de" ? "Gratis" : "Offert", true)).join("");
+    productTablesHtml = `
+      <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${lang === "de" ? "Bezahlte Produkte" : "Produits payants"}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
+        ${confirmHead}${paidLines.length ? paidRows : `<tr><td colspan="4" style="padding:12px 8px;font-size:12px;color:#bba8a1;font-style:italic;font-family:Arial,sans-serif">${lang === "de" ? "Keine bezahlten Produkte" : "Aucun produit payant"}</td></tr>`}
+      </table>
+      ${freeLines.length ? `
+      <p style="margin:20px 0 10px;font-size:11px;color:#d598aa;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #f0cad6">
+        ${confirmHead}${freeRows}
+      </table>` : ""}`;
+  } else {
+    const rows = orderLines.map((l) => makeConfirmRow(
+      l,
+      `${l.qty - l.freeQty}${l.freeQty > 0 ? ` +${l.freeQty}` : ""}`,
+      chf(l.unitPrice),
+      chf(l.lineTotal)
+    )).join("");
+    productTablesHtml = `
+      <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
+        ${confirmHead}${rows}
+      </table>`;
+  }
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -240,19 +278,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
           </tr>
         </table>
 
-        <!-- Section title -->
-        <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
-
-        <!-- Products table -->
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
-          <tr bgcolor="#f7f4f3">
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700;font-family:Arial,sans-serif">${labels.product}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700;font-family:Arial,sans-serif">${labels.qty}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.unit}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.total}</th>
-          </tr>
-          ${rows}
-        </table>
+        ${productTablesHtml}
 
         <!-- Totals -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px">
