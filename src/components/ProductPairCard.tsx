@@ -167,7 +167,13 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                 <p className="text-base font-bold mt-1" style={{ color: "#2d2020" }}>
                   {formatCHF(prod.price)}
                 </p>
-                <div className="mb-2 h-4" />
+                {recharge && prod.retailPrice ? (
+                  <p className="text-[10px] mb-2" style={{ color: "#bba8a1" }}>
+                    {t.prixVente} {formatCHF(prod.retailPrice)}
+                  </p>
+                ) : (
+                  <div className="mb-2 h-4" />
+                )}
                 <QuantitySelector
                   value={qty}
                   onChange={(v) => onChange(prod.ref, v)}
