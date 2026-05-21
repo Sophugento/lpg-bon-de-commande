@@ -11,7 +11,7 @@ import ProductInfoModal from "./ProductInfoModal";
 function StatusBadge({ status, t }: { status?: string; t: T }) {
   if (!status || status === "") return null;
   const config: Record<string, { label: string; bg: string; color: string }> = {
-    "new":              { label: t.statusNew,    bg: "#d598aa", color: "#fff" },
+    "new":              { label: t.statusNew,    bg: "#2d2020", color: "#fff" },
     "indisponible":     { label: t.statusIndispo, bg: "#e0dbd8", color: "#7a6e6a" },
     "rupture de stock": { label: t.statusRupture, bg: "#f5e4c0", color: "#8a6000" },
   };
