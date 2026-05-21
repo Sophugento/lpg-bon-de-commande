@@ -173,57 +173,99 @@ function buildConfirmHtml(payload: OrderPayload): string {
   }[lang];
 
   const rows = orderLines.map((l) => `
-    <tr style="border-bottom:1px solid #f0ebe9">
-      <td style="padding:7px 8px;font-size:13px">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:center">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:right">${chf(l.unitPrice)}</td>
-      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right">${chf(l.lineTotal)}</td>
+    <tr>
+      <td style="padding:8px;font-size:13px;color:#2d2020;border-bottom:1px solid #f0ebe9">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
+      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9">${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}</td>
+      <td style="padding:8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.unitPrice)}</td>
+      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap">${chf(l.lineTotal)}</td>
     </tr>`).join("");
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
-<head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#f7f4f3;font-family:system-ui,sans-serif">
-  <div style="max-width:620px;margin:24px auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08)">
-    <div style="background:linear-gradient(135deg,#d598aa,#c47d94);padding:28px 32px">
-      <h1 style="margin:0;color:white;font-size:22px;font-weight:700;letter-spacing:-0.5px">LPG Switzerland</h1>
-      <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:13px">${labels.title} — ${date}</p>
-    </div>
-    <div style="padding:28px 32px">
-      <p style="font-size:15px;margin:0 0 8px">${labels.intro}</p>
-      <p style="font-size:13px;color:#555;margin:0 0 20px;line-height:1.6">${labels.body}</p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background-color:#f7f4f3;font-family:Arial,Helvetica,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f7f4f3">
+<tr><td align="center" style="padding:24px 16px">
 
-      <div style="background:#fff8f0;border:1px solid #f5c542;border-radius:10px;padding:14px 16px;margin-bottom:24px">
-        <p style="margin:0;font-size:13px;color:#7a5c00;line-height:1.6">${labels.stock}</p>
-      </div>
+  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#ffffff;border:1px solid #ded5d1">
 
-      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
-        <thead>
-          <tr style="background:#f7f4f3">
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700">${labels.qty}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.unit}</th>
-            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.total}</th>
+    <!-- HEADER -->
+    <tr>
+      <td bgcolor="#d598aa" style="padding:28px 32px;background-color:#d598aa">
+        <p style="margin:0;color:#ffffff;font-size:22px;font-weight:700;font-family:Arial,sans-serif">LPG Switzerland</p>
+        <p style="margin:6px 0 0;color:#f9e8ef;font-size:13px;font-family:Arial,sans-serif">${labels.title} — ${date}</p>
+      </td>
+    </tr>
+
+    <!-- BODY -->
+    <tr>
+      <td style="padding:28px 32px">
+
+        <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#2d2020;font-family:Arial,sans-serif">${labels.intro}</p>
+        <p style="margin:0 0 24px;font-size:13px;color:#555555;line-height:1.6;font-family:Arial,sans-serif">${labels.body}</p>
+
+        <!-- Stock notice -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px">
+          <tr>
+            <td bgcolor="#fff8f0" style="padding:14px 16px;background-color:#fff8f0;border:1px solid #f5c542;border-left:4px solid #f5c542">
+              <p style="margin:0;font-size:13px;color:#7a5c00;line-height:1.6;font-family:Arial,sans-serif">${labels.stock}</p>
+            </td>
           </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+        </table>
 
-      <table style="width:100%;border-collapse:collapse;margin-top:16px">
-        <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.subtotal}</td><td style="font-size:13px;text-align:right">${chf(subtotal)}</td></tr>
-        <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.shipping}</td><td style="font-size:13px;text-align:right">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:16px;font-weight:700;border-top:2px solid #ded5d1">${labels.grandTotal}</td><td style="padding:10px 0 4px;font-size:16px;font-weight:700;text-align:right;border-top:2px solid #ded5d1;color:#d598aa">${chf(total)}</td></tr>
-        <tr><td style="padding:3px 0;font-size:11px;color:#bba8a1">${labels.totalTTC}</td><td style="font-size:11px;text-align:right;color:#bba8a1">${chf(total * 1.081)}</td></tr>
-      </table>
+        <!-- Section title -->
+        <p style="margin:0 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${labels.order}</p>
 
-      <p style="margin-top:28px;font-size:13px;color:#555">${labels.closing}</p>
-      <p style="margin:4px 0 0;font-size:13px;font-weight:600;color:#2d2020">${labels.team}</p>
-    </div>
-    <div style="background:#f7f4f3;padding:16px 32px;text-align:center;border-top:1px solid #ded5d1">
-      <p style="margin:0;font-size:11px;color:#bba8a1">LPG Switzerland — ${labels.title} 2026</p>
-    </div>
-  </div>
+        <!-- Products table -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
+          <tr bgcolor="#f7f4f3">
+            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700;font-family:Arial,sans-serif">${labels.product}</th>
+            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700;font-family:Arial,sans-serif">${labels.qty}</th>
+            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.unit}</th>
+            <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.total}</th>
+          </tr>
+          ${rows}
+        </table>
+
+        <!-- Totals -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px">
+          <tr>
+            <td style="padding:5px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.subtotal}</td>
+            <td style="padding:5px 0;font-size:13px;text-align:right;font-family:Arial,sans-serif">${chf(subtotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 0;font-size:13px;color:#666666;font-family:Arial,sans-serif">${labels.shipping}</td>
+            <td style="padding:5px 0;font-size:13px;text-align:right;font-family:Arial,sans-serif">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td>
+          </tr>
+          <tr>
+            <td style="padding:12px 0 4px;font-size:16px;font-weight:700;color:#2d2020;border-top:2px solid #ded5d1;font-family:Arial,sans-serif">${labels.grandTotal}</td>
+            <td style="padding:12px 0 4px;font-size:16px;font-weight:700;text-align:right;color:#d598aa;border-top:2px solid #ded5d1;font-family:Arial,sans-serif;white-space:nowrap">${chf(total)}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:11px;color:#bba8a1;font-family:Arial,sans-serif">${labels.totalTTC}</td>
+            <td style="padding:3px 0;font-size:11px;text-align:right;color:#bba8a1;font-family:Arial,sans-serif;white-space:nowrap">${chf(total * 1.081)}</td>
+          </tr>
+        </table>
+
+        <p style="margin:28px 0 4px;font-size:13px;color:#555555;font-family:Arial,sans-serif">${labels.closing}</p>
+        <p style="margin:0;font-size:13px;font-weight:700;color:#2d2020;font-family:Arial,sans-serif">${labels.team}</p>
+
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td bgcolor="#f7f4f3" style="padding:16px 32px;text-align:center;border-top:1px solid #ded5d1;background-color:#f7f4f3">
+        <p style="margin:0;font-size:11px;color:#bba8a1;font-family:Arial,sans-serif">LPG Switzerland — ${labels.title} 2026</p>
+      </td>
+    </tr>
+
+  </table>
+</td></tr>
+</table>
 </body>
 </html>`;
 }
