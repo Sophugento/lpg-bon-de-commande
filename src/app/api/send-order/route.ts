@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "LPG Switzerland <onboarding@resend.dev>",
+        from: "LPG Switzerland <commandes@lpgswitzerland.com>",
         to: [toEmail],
         reply_to: contact.email,
         subject,
