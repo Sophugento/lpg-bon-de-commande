@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
+// Liste des commerciales — ajouter ici les nouvelles adresses email
+const COMMERCIALES = [
+  "nathalie.madaire@lpgswitzerland.com",
+];
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
 import { calcPromo, formatCHF } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
@@ -93,15 +98,16 @@ export default function OrderModal({
     c.sameDelivery ||
     (c.delivery.address.trim() && c.delivery.postalCode.trim() && c.delivery.city.trim());
 
-  const isValid =
-    c.firstName.trim() &&
-    c.lastName.trim() &&
-    c.email.trim() &&
-    c.phone.trim() &&
-    c.address.trim() &&
-    c.postalCode.trim() &&
-    c.city.trim() &&
-    deliveryValid;
+  const isValid = isAdmin
+    ? true
+    : !!(c.firstName.trim() &&
+        c.lastName.trim() &&
+        c.email.trim() &&
+        c.phone.trim() &&
+        c.address.trim() &&
+        c.postalCode.trim() &&
+        c.city.trim() &&
+        deliveryValid);
 
   async function handleSubmit() {
     if (!isValid) return;
@@ -416,12 +422,22 @@ export default function OrderModal({
           <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
 
           {isAdmin && (
-            <Field
-              label="Votre e-mail (commerciale) — reçoit la confirmation en copie"
-              type="email"
-              value={salesEmail}
-              onChange={setSalesEmail}
-            />
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: "#bba8a1" }}>
+                Commerciale — reçoit la commande en copie
+              </label>
+              <select
+                value={salesEmail}
+                onChange={(e) => setSalesEmail(e.target.value)}
+                className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-[#d598aa] transition-colors bg-white"
+                style={{ borderColor: "#ded5d1" }}
+              >
+                <option value="">— Aucune —</option>
+                {COMMERCIALES.map((email) => (
+                  <option key={email} value={email}>{email}</option>
+                ))}
+              </select>
+            </div>
           )}
 
           {/* Adresse livraison */}

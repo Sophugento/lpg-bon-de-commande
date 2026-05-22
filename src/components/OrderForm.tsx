@@ -204,7 +204,7 @@ export default function OrderForm({ catalog }: Props) {
         ))}
       </div>
 
-      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} />
+      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} isAdmin={isAdmin} />
 
       {modalOpen && (
         <OrderModal

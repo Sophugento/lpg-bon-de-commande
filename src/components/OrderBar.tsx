@@ -8,14 +8,15 @@ interface Props {
   subtotal: number;
   onSubmit: () => void;
   t: T;
+  isAdmin?: boolean;
 }
 
-export default function OrderBar({ subtotal, onSubmit, t }: Props) {
+export default function OrderBar({ subtotal, onSubmit, t, isAdmin }: Props) {
   const shipping = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
   const totalTTC = total * 1.081;
   const missing = MIN_ORDER - subtotal;
-  const canSubmit = subtotal >= MIN_ORDER;
+  const canSubmit = isAdmin ? subtotal > 0 : subtotal >= MIN_ORDER;
 
   return (
     <div
@@ -59,7 +60,7 @@ export default function OrderBar({ subtotal, onSubmit, t }: Props) {
         >
           {subtotal === 0
             ? t.btnStart
-            : !canSubmit
+            : !canSubmit && !isAdmin
             ? t.btnMinNotReached(formatCHF(missing))
             : t.btnSend}
         </button>
