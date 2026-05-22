@@ -89,12 +89,12 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
         </div>
 
         {/* Colonnes */}
-        <div className="flex">
+        <div className={isAdmin && isPair ? "flex-col" : "flex"}>
           {/* REVENTE */}
           {revente && (
             <div
               className="flex-1 px-3 py-3"
-              style={isPair ? { borderRight: "1px solid #f0ebe9" } : {}}
+              style={isPair ? (isAdmin ? { borderBottom: "1px solid #f0ebe9" } : { borderRight: "1px solid #f0ebe9" }) : {}}
             >
               <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                 {(isPair || !hasCabine) && (
