@@ -42,6 +42,7 @@ interface OrderPayload {
   subtotal: number;
   shipping: number;
   total: number;
+  totalTTC?: number;
   lang: "fr" | "de";
 }
 
@@ -50,7 +51,8 @@ function chf(n: number) {
 }
 
 function buildHtml(payload: OrderPayload): string {
-  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, lang, isAdmin } = payload;
+  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, totalTTC: totalTTCPayload, lang, isAdmin } = payload;
+  const computedTTC = totalTTCPayload ?? total * 1.081;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit",
     month: "2-digit",
@@ -58,8 +60,8 @@ function buildHtml(payload: OrderPayload): string {
   });
 
   const labels = {
-    fr: { title: "Bon de commande", date: `Date : ${date}`, coord: "Coordonnées", delivery: "Adresse de livraison", order: "Commande", ref: "Réf.", product: "Produit", qty: "Qté", unit: "P.U.", total: "Total", subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts", grandTotal: "Total", totalTTC: "Total TTC (TVA 8.1%)", notes: "Notes", name: "Nom", studio: "Studio / Cabinet", addr: "Adresse", email: "E-mail", phone: "Tél.", typeRevente: "Revente", typeCabine: "Cabine", typeRecharge: "Recharge" },
-    de: { title: "Bestellformular", date: `Datum: ${date}`, coord: "Kontaktdaten", delivery: "Lieferadresse", order: "Bestellung", ref: "Ref.", product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total", subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis", grandTotal: "Total", totalTTC: "Total inkl. MwSt. (8.1%)", notes: "Bemerkungen", name: "Name", studio: "Firma / Studio", addr: "Adresse", email: "E-Mail", phone: "Tel.", typeRevente: "Verkauf", typeCabine: "Professionell", typeRecharge: "Nachfüllung" },
+    fr: { title: "Bon de commande", date: `Date : ${date}`, coord: "Coordonnées", delivery: "Adresse de livraison", order: "Commande", ref: "Réf.", product: "Produit", qty: "Qté", unit: "P.U.", total: "Total", subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts", grandTotal: "Total", totalTTC: "Total TTC (TVA incluse)", notes: "Notes", name: "Nom", studio: "Studio / Cabinet", addr: "Adresse", email: "E-mail", phone: "Tél.", typeRevente: "Revente", typeCabine: "Cabine", typeRecharge: "Recharge" },
+    de: { title: "Bestellformular", date: `Datum: ${date}`, coord: "Kontaktdaten", delivery: "Lieferadresse", order: "Bestellung", ref: "Ref.", product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total", subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis", grandTotal: "Total", totalTTC: "Total inkl. MwSt.", notes: "Bemerkungen", name: "Name", studio: "Firma / Studio", addr: "Adresse", email: "E-Mail", phone: "Tel.", typeRevente: "Verkauf", typeCabine: "Professionell", typeRecharge: "Nachfüllung" },
   }[lang];
 
   const sameDelivery = contact.sameDelivery;
@@ -150,7 +152,7 @@ function buildHtml(payload: OrderPayload): string {
         <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.subtotal}</td><td style="font-size:13px;text-align:right">${chf(subtotal)}</td></tr>
         <tr><td style="padding:5px 0;font-size:13px;color:#666">${labels.shipping}</td><td style="font-size:13px;text-align:right">${shipping === 0 ? labels.shippingFree : chf(shipping)}</td></tr>
         <tr><td style="padding:10px 0 4px;font-size:16px;font-weight:700;border-top:2px solid #ded5d1">${labels.grandTotal}</td><td style="padding:10px 0 4px;font-size:16px;font-weight:700;text-align:right;border-top:2px solid #ded5d1;color:#d598aa">${chf(total)}</td></tr>
-        <tr><td style="padding:3px 0;font-size:11px;color:#bba8a1">${labels.totalTTC}</td><td style="font-size:11px;text-align:right;color:#bba8a1">${chf(total * 1.081)}</td></tr>
+        <tr><td style="padding:3px 0;font-size:11px;color:#bba8a1">${labels.totalTTC}</td><td style="font-size:11px;text-align:right;color:#bba8a1">${chf(computedTTC)}</td></tr>
       </table>
 
       ${contact.notes ? `<div style="margin-top:20px;padding:14px;background:#f7f4f3;border-radius:10px"><p style="margin:0;font-size:12px;color:#666"><strong>${labels.notes} :</strong> ${contact.notes}</p></div>` : ""}
@@ -164,7 +166,8 @@ function buildHtml(payload: OrderPayload): string {
 }
 
 function buildConfirmHtml(payload: OrderPayload): string {
-  const { contact, orderLines, subtotal, shipping, total, lang, isAdmin } = payload;
+  const { contact, orderLines, subtotal, shipping, total, totalTTC: totalTTCPayload, lang, isAdmin } = payload;
+  const computedTTC = totalTTCPayload ?? total * 1.081;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit", month: "2-digit", year: "numeric",
   });
@@ -178,7 +181,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
       order: "Votre commande",
       product: "Produit", qty: "Qté", unit: "P.U.", total: "Total",
       subtotal: "Sous-total", shipping: "Frais de port", shippingFree: "Offerts",
-      grandTotal: "Total HT", totalTTC: "Total TTC (TVA 8.1%)",
+      grandTotal: "Total HT", totalTTC: "Total TTC (TVA incluse)",
       closing: "Merci pour votre confiance.",
       team: "L'équipe LPG Switzerland",
     },
@@ -190,7 +193,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
       order: "Ihre Bestellung",
       product: "Produkt", qty: "Anz.", unit: "E.P.", total: "Total",
       subtotal: "Zwischensumme", shipping: "Porto", shippingFree: "Gratis",
-      grandTotal: "Total netto", totalTTC: "Total inkl. MwSt. (8.1%)",
+      grandTotal: "Total netto", totalTTC: "Total inkl. MwSt.",
       closing: "Vielen Dank für Ihr Vertrauen.",
       team: "Das LPG Switzerland Team",
     },
@@ -296,7 +299,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
           </tr>
           <tr>
             <td style="padding:3px 0;font-size:11px;color:#bba8a1;font-family:Arial,sans-serif">${labels.totalTTC}</td>
-            <td style="padding:3px 0;font-size:11px;text-align:right;color:#bba8a1;font-family:Arial,sans-serif;white-space:nowrap">${chf(total * 1.081)}</td>
+            <td style="padding:3px 0;font-size:11px;text-align:right;color:#bba8a1;font-family:Arial,sans-serif;white-space:nowrap">${chf(computedTTC)}</td>
           </tr>
         </table>
 

@@ -9,6 +9,7 @@ import OrderBar from "@/components/OrderBar";
 import OrderModal from "@/components/OrderModal";
 import AdminLoginModal from "@/components/AdminLoginModal";
 import { Catalog } from "@/lib/catalog";
+import { SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
 
 interface Props {
   catalog: Catalog;
@@ -68,6 +69,19 @@ export default function OrderForm({ catalog }: Props) {
     );
     return Math.round((productTotal + offerTotal) * 100) / 100;
   }, [quantities, offerQtys, products, offers, isAdmin]);
+
+  const totalTTC = useMemo(() => {
+    const nutriSubtotal = products.reduce((sum, p) => {
+      if (p.category !== "Nutricosmetics") return sum;
+      const qty = quantities[p.ref] || 0;
+      if (qty === 0) return sum;
+      const paid = isAdmin || !p.promoEligible ? qty : calcPromo(qty).paid;
+      return sum + paid * p.price;
+    }, 0);
+    const otherSubtotal = subtotal - nutriSubtotal;
+    const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    return Math.round((nutriSubtotal * 1.026 + (otherSubtotal + shipping) * 1.081) * 100) / 100;
+  }, [quantities, subtotal, products, isAdmin]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
@@ -204,7 +218,7 @@ export default function OrderForm({ catalog }: Props) {
         ))}
       </div>
 
-      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} isAdmin={isAdmin} />
+      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} isAdmin={isAdmin} totalTTC={totalTTC} />
 
       {modalOpen && (
         <OrderModal
@@ -219,6 +233,7 @@ export default function OrderForm({ catalog }: Props) {
           lang={lang}
           isAdmin={isAdmin}
           freeQuantities={freeQuantities}
+          totalTTC={totalTTC}
         />
       )}
 

@@ -45,6 +45,7 @@ interface Props {
   lang: Lang;
   isAdmin?: boolean;
   freeQuantities?: Record<string, number>;
+  totalTTC?: number;
 }
 
 const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
@@ -61,6 +62,7 @@ export default function OrderModal({
   lang,
   isAdmin,
   freeQuantities,
+  totalTTC: totalTTCProp,
 }: Props) {
   const [c, setC] = useState<ContactInfo>({
     firstName: "",
@@ -81,7 +83,7 @@ export default function OrderModal({
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
-  const totalTTC = total * 1.081;
+  const totalTTC = totalTTCProp ?? total * 1.081;
 
   const selectedProducts = isAdmin
     ? products.filter((p) => (quantities[p.ref] || 0) > 0 || (freeQuantities?.[p.ref] || 0) > 0)
@@ -169,6 +171,7 @@ export default function OrderModal({
           subtotal,
           shipping,
           total,
+          totalTTC,
           lang,
         }),
       });
