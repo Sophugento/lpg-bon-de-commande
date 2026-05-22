@@ -322,9 +322,9 @@ function buildConfirmHtml(payload: OrderPayload): string {
 
 export async function POST(req: NextRequest) {
   const payload: OrderPayload = await req.json();
-  const { contact, orderLines, lang, salesEmail } = payload;
+  const { contact, orderLines, lang, salesEmail, isAdmin } = payload;
 
-  if (!contact.email || !contact.firstName || orderLines.length === 0) {
+  if ((!isAdmin && (!contact.email || !contact.firstName)) || orderLines.length === 0) {
     return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
   }
 
@@ -374,26 +374,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Confirmation email to the customer
-  const confirmSubject = lang === "de"
-    ? `Ihre Bestellung — LPG Switzerland`
-    : `Confirmation de commande — LPG Switzerland`;
+  // Confirmation email to the customer (only if email is provided)
+  if (contact.email) {
+    const confirmSubject = lang === "de"
+      ? `Ihre Bestellung — LPG Switzerland`
+      : `Confirmation de commande — LPG Switzerland`;
 
-  const confirmHtml = buildConfirmHtml(payload);
+    const confirmHtml = buildConfirmHtml(payload);
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "LPG Switzerland <order.ch@lpgswitzerland.com>",
-      to: [contact.email],
-      subject: confirmSubject,
-      html: confirmHtml,
-    }),
-  });
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "LPG Switzerland <order.ch@lpgswitzerland.com>",
+        to: [contact.email],
+        subject: confirmSubject,
+        html: confirmHtml,
+      }),
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }
