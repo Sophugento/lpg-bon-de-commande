@@ -403,23 +403,30 @@ export default function OrderModal({
           </div>
 
           {/* Coordonnées */}
-          <p className="text-xs font-bold uppercase tracking-wide pt-1" style={{ color: "#bba8a1" }}>
-            {t.coordTitle}
-          </p>
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-xs font-bold uppercase tracking-wide" style={{ color: "#bba8a1" }}>
+              {t.coordTitle}
+            </p>
+            {isAdmin && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: "#f0ebe9", color: "#bba8a1" }}>
+                Champs facultatifs
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t.firstName} value={c.firstName} onChange={(v) => upd("firstName", v)} />
-            <Field label={t.lastName} value={c.lastName} onChange={(v) => upd("lastName", v)} />
+            <Field label={fl(t.firstName, isAdmin)} value={c.firstName} onChange={(v) => upd("firstName", v)} />
+            <Field label={fl(t.lastName, isAdmin)} value={c.lastName} onChange={(v) => upd("lastName", v)} />
           </div>
           <Field label={t.company} value={c.company} onChange={(v) => upd("company", v)} />
-          <Field label={t.address} value={c.address} onChange={(v) => upd("address", v)} />
+          <Field label={fl(t.address, isAdmin)} value={c.address} onChange={(v) => upd("address", v)} />
           <div className="grid grid-cols-3 gap-3">
-            <Field label={t.postalCode} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
+            <Field label={fl(t.postalCode, isAdmin)} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
             <div className="col-span-2">
-              <Field label={t.city} value={c.city} onChange={(v) => upd("city", v)} />
+              <Field label={fl(t.city, isAdmin)} value={c.city} onChange={(v) => upd("city", v)} />
             </div>
           </div>
-          <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
-          <Field label={t.phone} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
+          <Field label={fl(t.email, isAdmin)} type="email" value={c.email} onChange={(v) => upd("email", v)} />
+          <Field label={fl(t.phone, isAdmin)} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
 
           {isAdmin && (
             <div>
@@ -493,6 +500,11 @@ export default function OrderModal({
       </div>
     </ModalShell>
   );
+}
+
+// Strip " *" from label in admin mode (fields are optional)
+function fl(label: string, isAdmin?: boolean) {
+  return isAdmin ? label.replace(" *", "") : label;
 }
 
 function Field({
