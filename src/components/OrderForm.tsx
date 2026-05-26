@@ -162,9 +162,11 @@ export default function OrderForm({ catalog }: Props) {
         <p className="font-bold" style={{ color: "#bf7585" }}>
           {t.rulesTitle}
         </p>
-        <p style={{ color: "#8a5565" }}>
-          • {t.ruleMin} <strong>250 CHF</strong> {t.priceNote}
-        </p>
+        {!isAdmin && (
+          <p style={{ color: "#8a5565" }}>
+            • {t.ruleMin} <strong>250 CHF</strong> {t.priceNote}
+          </p>
+        )}
         <p style={{ color: "#8a5565" }}>
           • {t.ruleShipping} <strong>20 CHF</strong> {t.ruleShippingDetail}
         </p>
