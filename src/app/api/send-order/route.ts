@@ -207,7 +207,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700;font-family:Arial,sans-serif">${labels.total}</th>
     </tr>`;
 
-  const makeConfirmRow = (l: OrderLine, qtyDisplay: string, unitDisplay: string, totalDisplay: string, pink = false) => `
+  const makeConfirmRow = (l: OrderLine, qtyDisplay: string, unitDisplay: string, totalDisplay: string) => `
     <tr>
       <td style="padding:8px;font-size:13px;color:#2d2020;border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
       <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9;color:#2d2020;font-family:Arial,sans-serif">${qtyDisplay}</td>
