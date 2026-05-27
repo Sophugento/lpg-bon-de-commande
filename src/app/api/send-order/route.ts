@@ -220,7 +220,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
     const paidLines = orderLines.filter((l) => (l.qty - l.freeQty) > 0);
     const freeLines = orderLines.filter((l) => l.freeQty > 0);
     const paidRows = paidLines.map((l) => makeConfirmRow(l, String(l.qty - l.freeQty), chf(l.unitPrice), chf(l.lineTotal))).join("");
-    const freeRows = freeLines.map((l) => makeConfirmRow(l, String(l.freeQty), "", lang === "de" ? "Gratis" : "Offert", true)).join("");
+    const freeRows = freeLines.map((l) => makeConfirmRow(l, String(l.freeQty), "", lang === "de" ? "Gratis" : "Offert")).join("");
     productTablesHtml = `
       <p style="margin:24px 0 10px;font-size:11px;color:#bba8a1;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${lang === "de" ? "Bezahlte Produkte" : "Produits payants"}</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
