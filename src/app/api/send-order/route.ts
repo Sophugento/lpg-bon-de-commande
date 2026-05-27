@@ -94,10 +94,10 @@ function buildHtml(payload: OrderPayload): string {
     return `
     <tr style="border-bottom:1px solid #f0ebe9">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#d598aa;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:center;${dimmed ? "color:#d598aa;" : ""}">${qtyDisplay}</td>
+      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#2d2020;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:center;${dimmed ? "color:#2d2020;" : ""}">${qtyDisplay}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:right">${dimmed ? "" : chf(l.unitPrice)}</td>
-      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;${dimmed ? "color:#d598aa;" : ""}">${totalDisplay}</td>
+      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;${dimmed ? "color:#2d2020;" : ""}">${totalDisplay}</td>
     </tr>`;
   };
 
@@ -113,8 +113,8 @@ function buildHtml(payload: OrderPayload): string {
         ${tableHead}<tbody>${paidLines.length ? paidRows : `<tr><td colspan="5" style="padding:12px 8px;font-size:12px;color:#bba8a1;font-style:italic">${lang === "de" ? "Keine bezahlten Produkte" : "Aucun produit payant"}</td></tr>`}</tbody>
       </table>
       ${freeLines.length ? `
-      <h2 style="font-size:11px;color:#d598aa;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #f0cad6;border-radius:8px;overflow:hidden">
+      <h2 style="font-size:11px;color:#2d2020;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
         ${tableHead}<tbody>${freeRows}</tbody>
       </table>` : ""}`;
   } else {
@@ -209,10 +209,10 @@ function buildConfirmHtml(payload: OrderPayload): string {
 
   const makeConfirmRow = (l: OrderLine, qtyDisplay: string, unitDisplay: string, totalDisplay: string, pink = false) => `
     <tr>
-      <td style="padding:8px;font-size:13px;color:${pink ? "#d598aa" : "#2d2020"};border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
-      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9;color:${pink ? "#d598aa" : "inherit"};font-family:Arial,sans-serif">${qtyDisplay}</td>
+      <td style="padding:8px;font-size:13px;color:#2d2020;border-bottom:1px solid #f0ebe9;font-family:Arial,sans-serif">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}</td>
+      <td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #f0ebe9;color:#2d2020;font-family:Arial,sans-serif">${qtyDisplay}</td>
       <td style="padding:8px;font-size:12px;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;font-family:Arial,sans-serif">${unitDisplay}</td>
-      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;color:${pink ? "#d598aa" : "inherit"};font-family:Arial,sans-serif">${totalDisplay}</td>
+      <td style="padding:8px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #f0ebe9;white-space:nowrap;color:#2d2020;font-family:Arial,sans-serif">${totalDisplay}</td>
     </tr>`;
 
   let productTablesHtml: string;
@@ -227,8 +227,8 @@ function buildConfirmHtml(payload: OrderPayload): string {
         ${confirmHead}${paidLines.length ? paidRows : `<tr><td colspan="4" style="padding:12px 8px;font-size:12px;color:#bba8a1;font-style:italic;font-family:Arial,sans-serif">${lang === "de" ? "Keine bezahlten Produkte" : "Aucun produit payant"}</td></tr>`}
       </table>
       ${freeLines.length ? `
-      <p style="margin:20px 0 10px;font-size:11px;color:#d598aa;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</p>
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #f0cad6">
+      <p style="margin:20px 0 10px;font-size:11px;color:#2d2020;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ded5d1">
         ${confirmHead}${freeRows}
       </table>` : ""}`;
   } else {
