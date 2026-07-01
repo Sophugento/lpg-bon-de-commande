@@ -118,7 +118,7 @@ function buildHtml(payload: OrderPayload): string {
         ${tableHead}<tbody>${freeRows}</tbody>
       </table>` : ""}`;
   } else {
-    const rows = orderLines.map((l) => makeRow(l, `${l.qty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}`, chf(l.lineTotal))).join("");
+    const rows = orderLines.map((l) => makeRow(l, `${l.qty - l.freeQty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}`, chf(l.lineTotal))).join("");
     orderTableHtml = `
       <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
       <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
