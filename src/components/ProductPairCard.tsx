@@ -150,7 +150,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                       </p>
                       {revente.promoEligible && reventeFree > 0 && (
                         <p className="text-[10px]" style={{ color: "#d598aa" }}>
-                          {t.promoLabel(reventeFree, reventeQty >= 10 ? "10+2" : "6+1")}
+                          {t.promoLabel(reventeFree)}
                         </p>
                       )}
                       {revente.promoEligible && reventeQty < 3 && reventeQty > 0 && (

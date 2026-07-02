@@ -65,7 +65,7 @@ export const TRANSLATIONS = {
     statusRupture: "Rupture de stock",
 
     // Promo
-    promoLabel: (n: number, code: string) => `🎁 +${n} offert${n > 1 ? "s" : ""} (${code})`,
+    promoLabel: (n: number) => `🎁 +${n} offert${n > 1 ? "s" : ""}`,
     minQtyWarning: "Min. 3 pièces requis",
 
     // Barre commande
@@ -167,7 +167,7 @@ export const TRANSLATIONS = {
     statusIndispo: "Nicht verfügbar",
     statusRupture: "Nicht vorrätig",
 
-    promoLabel: (n: number, code: string) => `🎁 +${n} geschenkt (${code})`,
+    promoLabel: (n: number) => `🎁 +${n} geschenkt`,
     minQtyWarning: "Mind. 3 Stück erforderlich",
 
     sousTotal: "Zwischensumme",
