@@ -164,7 +164,7 @@ export default function OrderForm({ catalog }: Props) {
         </p>
         {!isAdmin && (
           <p style={{ color: "#8a5565" }}>
-            • {t.ruleMin} <strong>250 CHF</strong> {t.priceNote}
+            • {t.ruleMin} <strong>100 CHF</strong> {t.priceNote}
           </p>
         )}
         <p style={{ color: "#8a5565" }}>
