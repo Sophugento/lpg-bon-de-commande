@@ -79,8 +79,8 @@ function buildHtml(payload: OrderPayload): string {
   const tableHead = `
     <thead><tr style="background:#f7f4f3">
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.ref}</th>
-      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700">${labels.qty}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.unit}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.total}</th>
     </tr></thead>`;
@@ -94,8 +94,8 @@ function buildHtml(payload: OrderPayload): string {
     return `
     <tr style="border-bottom:1px solid #f0ebe9">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#2d2020;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:center;${dimmed ? "color:#2d2020;" : ""}">${qtyDisplay}</td>
+      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#2d2020;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:right">${dimmed ? "" : chf(l.unitPrice)}</td>
       <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;${dimmed ? "color:#2d2020;" : ""}">${totalDisplay}</td>
     </tr>`;

@@ -1429,7 +1429,7 @@ export const PRODUCTS: Product[] = [
 
 export const SHIPPING_THRESHOLD = 400;
 export const SHIPPING_COST = 20;
-export const MIN_ORDER = 250;
+export const MIN_ORDER = 100;
 export const MIN_QTY_REVENTE = 3;
 
 export const CATEGORIES = [
