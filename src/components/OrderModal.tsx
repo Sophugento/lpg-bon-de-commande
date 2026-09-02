@@ -83,7 +83,7 @@ export default function OrderModal({
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
-  const totalTTC = totalTTCProp ?? total * 1.081;
+  const totalTTC = totalTTCProp ?? Math.round(total * 1.081 * 20) / 20;
 
   const selectedProducts = isAdmin
     ? products.filter((p) => (quantities[p.ref] || 0) > 0 || (freeQuantities?.[p.ref] || 0) > 0)

@@ -15,7 +15,7 @@ interface Props {
 export default function OrderBar({ subtotal, onSubmit, t, isAdmin, totalTTC: totalTTCProp }: Props) {
   const shipping = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
-  const totalTTC = totalTTCProp ?? total * 1.081;
+  const totalTTC = totalTTCProp ?? Math.round(total * 1.081 * 20) / 20;
   const missing = MIN_ORDER - subtotal;
   const canSubmit = isAdmin ? subtotal > 0 : subtotal >= MIN_ORDER;
 

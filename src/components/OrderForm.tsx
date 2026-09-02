@@ -80,7 +80,7 @@ export default function OrderForm({ catalog }: Props) {
     }, 0);
     const otherSubtotal = subtotal - nutriSubtotal;
     const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    return Math.round((nutriSubtotal * 1.026 + (otherSubtotal + shipping) * 1.081) * 100) / 100;
+    return Math.round((nutriSubtotal * 1.026 + (otherSubtotal + shipping) * 1.081) * 20) / 20;
   }, [quantities, subtotal, products, isAdmin]);
 
   const categories = useMemo(
