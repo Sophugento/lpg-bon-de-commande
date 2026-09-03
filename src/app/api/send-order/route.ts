@@ -80,51 +80,42 @@ function buildHtml(payload: OrderPayload): string {
     <thead><tr style="background:#f7f4f3">
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.ref}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:center;font-weight:700">${labels.qty}</th>
+      <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">Type</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.product}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.unit}</th>
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:right;font-weight:700">${labels.total}</th>
     </tr></thead>`;
 
-  const makeRow = (l: OrderLine, qtyDisplay: number | string, totalDisplay: string, dimmed = false) => {
+  const makeRow = (l: OrderLine, qtyDisplay: string, totalDisplay: string, isFree = false) => {
     const tl = typeLabel(l.type);
-    const detail = [tl, l.size].filter(Boolean).join(" – ");
-    const descHtml = l.type === "offre" && (l.description || l.gift)
+    const descHtml = l.type === "offre" && !isFree && (l.description || l.gift)
       ? `${l.description ? `<br><span style="font-size:11px;color:#bba8a1;font-weight:400">${l.description}</span>` : ""}${l.gift ? `<br><span style="font-size:11px;color:#d598aa;font-weight:400">🎁 ${l.gift}</span>` : ""}`
       : "";
+    const gratuitBadge = isFree ? ` <span style="font-size:10px;font-weight:700;color:#2d2020;text-transform:uppercase;background:#f0ebe9;padding:1px 5px;border-radius:3px">${lang === "de" ? "GRATIS" : "GRATUIT"}</span>` : "";
     return `
-    <tr style="border-bottom:1px solid #f0ebe9">
+    <tr style="border-bottom:1px solid #f0ebe9${isFree ? ";background:#faf9f8" : ""}">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:center;${dimmed ? "color:#2d2020;" : ""}">${qtyDisplay}</td>
-      <td style="padding:7px 8px;font-size:13px;${dimmed ? "color:#2d2020;" : ""}">${l.name}${detail ? ` <span style="color:#bba8a1;font-size:11px">(${detail})</span>` : ""}${descHtml}</td>
-      <td style="padding:7px 8px;font-size:12px;text-align:right">${dimmed ? "" : chf(l.unitPrice)}</td>
-      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;${dimmed ? "color:#2d2020;" : ""}">${totalDisplay}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:center;font-weight:600;color:#2d2020">${qtyDisplay}</td>
+      <td style="padding:7px 8px;font-size:11px;color:#bba8a1;white-space:nowrap">${tl}</td>
+      <td style="padding:7px 8px;font-size:13px;color:#2d2020">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}${gratuitBadge}${descHtml}</td>
+      <td style="padding:7px 8px;font-size:12px;text-align:right;color:#666">${isFree ? "" : chf(l.unitPrice)}</td>
+      <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;color:#2d2020">${totalDisplay}</td>
     </tr>`;
   };
 
-  let orderTableHtml: string;
-  if (isAdmin) {
-    const paidLines = orderLines.filter((l) => (l.qty - l.freeQty) > 0);
-    const freeLines = orderLines.filter((l) => l.freeQty > 0);
-    const paidRows = paidLines.map((l) => makeRow(l, l.qty - l.freeQty, chf(l.lineTotal))).join("");
-    const freeRows = freeLines.map((l) => makeRow(l, l.freeQty, lang === "de" ? "Gratis" : "Offert", true)).join("");
-    orderTableHtml = `
-      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Bezahlte Produkte" : "Produits payants"}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden;margin-bottom:20px">
-        ${tableHead}<tbody>${paidLines.length ? paidRows : `<tr><td colspan="5" style="padding:12px 8px;font-size:12px;color:#bba8a1;font-style:italic">${lang === "de" ? "Keine bezahlten Produkte" : "Aucun produit payant"}</td></tr>`}</tbody>
-      </table>
-      ${freeLines.length ? `
-      <h2 style="font-size:11px;color:#2d2020;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">${lang === "de" ? "Gratisprodukte" : "Produits offerts"}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
-        ${tableHead}<tbody>${freeRows}</tbody>
-      </table>` : ""}`;
-  } else {
-    const rows = orderLines.map((l) => makeRow(l, `${l.qty - l.freeQty}${l.freeQty > 0 ? ` <span style="color:#d598aa">+${l.freeQty}</span>` : ""}`, chf(l.lineTotal))).join("");
-    orderTableHtml = `
-      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
-        ${tableHead}<tbody>${rows}</tbody>
-      </table>`;
-  }
+  const buildRows = () => orderLines.map((l) => {
+    const paidQty = l.qty - l.freeQty;
+    let html = "";
+    if (paidQty > 0) html += makeRow(l, String(paidQty), chf(l.lineTotal), false);
+    if (l.freeQty > 0) html += makeRow(l, String(l.freeQty), "—", true);
+    return html;
+  }).join("");
+
+  const orderTableHtml = `
+    <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
+      ${tableHead}<tbody>${buildRows()}</tbody>
+    </table>`;
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -136,15 +127,13 @@ function buildHtml(payload: OrderPayload): string {
       <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:13px">${labels.title} — ${date}</p>
     </div>
     <div style="padding:28px 32px">
-      <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.coord}</h2>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
-        <tr><td style="padding:4px 0;font-size:13px;color:#666;width:140px">${labels.name}</td><td style="font-size:13px;font-weight:600">${contact.firstName} ${contact.lastName}</td></tr>
-        ${contact.company ? `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.studio}</td><td style="font-size:13px">${contact.company}</td></tr>` : ""}
-        <tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.addr}</td><td style="font-size:13px">${contact.address}, ${contact.postalCode} ${contact.city}</td></tr>
-        <tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.email}</td><td style="font-size:13px">${contact.email}</td></tr>
-        ${contact.phone ? `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.phone}</td><td style="font-size:13px">${contact.phone}</td></tr>` : ""}
-        ${deliveryHtml}
-      </table>
+      <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #ded5d1">
+        <p style="margin:0;font-size:20px;font-weight:700;color:#2d2020;letter-spacing:-0.3px">${contact.company || (contact.firstName + " " + contact.lastName)}</p>
+        ${contact.company ? `<p style="margin:3px 0 0;font-size:13px;color:#666">${contact.firstName} ${contact.lastName}</p>` : ""}
+        <p style="margin:4px 0 0;font-size:12px;color:#666">${contact.address ? contact.address + ", " : ""}${contact.postalCode} ${contact.city}</p>
+        ${contact.email ? `<p style="margin:2px 0 0;font-size:12px;color:#666">${contact.email}${contact.phone ? " · " + contact.phone : ""}</p>` : ""}
+        ${!sameDelivery ? `<p style="margin:6px 0 0;font-size:12px;color:#666"><strong>${labels.delivery} :</strong> ${deliveryAddress.company ? deliveryAddress.company + ", " : ""}${deliveryAddress.address}, ${deliveryAddress.postalCode} ${deliveryAddress.city}</p>` : ""}
+      </div>
 
       ${orderTableHtml}
 
