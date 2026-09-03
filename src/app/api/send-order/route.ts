@@ -51,7 +51,7 @@ function chf(n: number) {
 }
 
 function buildHtml(payload: OrderPayload): string {
-  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, totalTTC: totalTTCPayload, lang, isAdmin } = payload;
+  const { contact, deliveryAddress, orderLines, subtotal, shipping, total, totalTTC: totalTTCPayload, lang } = payload;
   const computedTTC = totalTTCPayload ?? total * 1.081;
   const date = new Date().toLocaleDateString(lang === "de" ? "de-CH" : "fr-CH", {
     day: "2-digit",
@@ -65,9 +65,6 @@ function buildHtml(payload: OrderPayload): string {
   }[lang];
 
   const sameDelivery = contact.sameDelivery;
-  const deliveryHtml = sameDelivery
-    ? `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.delivery}</td><td style="font-size:13px">Identique / Gleich</td></tr>`
-    : `<tr><td style="padding:4px 0;font-size:13px;color:#666">${labels.delivery}</td><td style="font-size:13px">${deliveryAddress.company ? deliveryAddress.company + "<br>" : ""}${deliveryAddress.address}<br>${deliveryAddress.postalCode} ${deliveryAddress.city}</td></tr>`;
 
   const typeLabel = (type: string) => {
     if (type === "revente") return labels.typeRevente;
