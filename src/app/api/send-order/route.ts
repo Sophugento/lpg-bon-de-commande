@@ -73,6 +73,16 @@ function buildHtml(payload: OrderPayload): string {
     return "";
   };
 
+  const typeBadge = (type: string) => {
+    const label = typeLabel(type);
+    if (!label) return "";
+    let bg = "#f0ebe9", color = "#bba8a1";
+    if (type === "revente")      { bg = "#f9e8ef"; color = "#c0547a"; }
+    if (type === "professionnel") { bg = "#e8edf5"; color = "#3d5a8a"; }
+    if (type === "recharge")     { bg = "#eef3ec"; color = "#4a7a52"; }
+    return `<span style="display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:2px 6px;border-radius:4px;background:${bg};color:${color}">${label}</span>`;
+  };
+
   const tableHead = `
     <thead><tr style="background:#f7f4f3">
       <th style="padding:8px;font-size:10px;color:#bba8a1;text-align:left;font-weight:700">${labels.ref}</th>
@@ -84,7 +94,6 @@ function buildHtml(payload: OrderPayload): string {
     </tr></thead>`;
 
   const makeRow = (l: OrderLine, qtyDisplay: string, totalDisplay: string, isFree = false) => {
-    const tl = typeLabel(l.type);
     const descHtml = l.type === "offre" && !isFree && (l.description || l.gift)
       ? `${l.description ? `<br><span style="font-size:11px;color:#bba8a1;font-weight:400">${l.description}</span>` : ""}${l.gift ? `<br><span style="font-size:11px;color:#d598aa;font-weight:400">🎁 ${l.gift}</span>` : ""}`
       : "";
@@ -93,7 +102,7 @@ function buildHtml(payload: OrderPayload): string {
     <tr style="border-bottom:1px solid #f0ebe9${isFree ? ";background:#faf9f8" : ""}">
       <td style="padding:7px 8px;font-size:11px;color:#999">${l.ref}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:center;font-weight:600;color:#2d2020">${qtyDisplay}</td>
-      <td style="padding:7px 8px;font-size:11px;color:#bba8a1;white-space:nowrap">${tl}</td>
+      <td style="padding:7px 8px;white-space:nowrap">${typeBadge(l.type)}</td>
       <td style="padding:7px 8px;font-size:13px;color:#2d2020">${l.name}${l.size ? ` <span style="color:#bba8a1;font-size:11px">(${l.size})</span>` : ""}${gratuitBadge}${descHtml}</td>
       <td style="padding:7px 8px;font-size:12px;text-align:right;color:#666">${isFree ? "" : chf(l.unitPrice)}</td>
       <td style="padding:7px 8px;font-size:13px;font-weight:600;text-align:right;color:#2d2020">${totalDisplay}</td>
