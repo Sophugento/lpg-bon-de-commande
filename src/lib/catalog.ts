@@ -79,7 +79,7 @@ export async function getCatalog(): Promise<Catalog> {
       }));
 
     // ── Offres ─────────────────────────────────────────────────────────
-    const offers: Offer[] = offerRows
+    const parsedOffers: Offer[] = offerRows
       .filter((r) => str(r["ID"]) && !str(r["ID"]).startsWith("📌"))
       .map((r) => ({
         id: str(r["ID"]),
@@ -89,6 +89,8 @@ export async function getCatalog(): Promise<Catalog> {
         description: str(r["Description (contenu)"]),
         gift: str(r["Cadeau inclus"]),
       }));
+    // Fallback to static offers if sheet returned nothing (e.g. column name mismatch)
+    const offers: Offer[] = parsedOffers.length > 0 ? parsedOffers : OFFERS;
 
     // ── Descriptions & images ──────────────────────────────────────────
     const productInfo: Record<string, ProductInfo> = {};
