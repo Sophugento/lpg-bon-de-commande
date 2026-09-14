@@ -106,6 +106,7 @@ export default function OrderModal({
     ? true
     : !!(c.firstName.trim() &&
         c.lastName.trim() &&
+        c.company.trim() &&
         c.email.trim() &&
         c.phone.trim() &&
         c.address.trim() &&
@@ -422,7 +423,7 @@ export default function OrderModal({
             <Field label={fl(t.firstName, isAdmin)} value={c.firstName} onChange={(v) => upd("firstName", v)} />
             <Field label={fl(t.lastName, isAdmin)} value={c.lastName} onChange={(v) => upd("lastName", v)} />
           </div>
-          <Field label={t.company} value={c.company} onChange={(v) => upd("company", v)} />
+          <Field label={fl(t.company, isAdmin)} value={c.company} onChange={(v) => upd("company", v)} />
           <Field label={fl(t.address, isAdmin)} value={c.address} onChange={(v) => upd("address", v)} />
           <div className="grid grid-cols-3 gap-3">
             <Field label={fl(t.postalCode, isAdmin)} value={c.postalCode} onChange={(v) => upd("postalCode", v)} />
