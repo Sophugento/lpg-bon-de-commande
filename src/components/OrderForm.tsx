@@ -71,17 +71,25 @@ export default function OrderForm({ catalog }: Props) {
   }, [quantities, offerQtys, products, offers, isAdmin]);
 
   const totalTTC = useMemo(() => {
-    const nutriSubtotal = products.reduce((sum, p) => {
-      if (p.category !== "Nutricosmetics") return sum;
+    // Winbiz arrondit la TVA ligne par ligne au 0.05 CHF, puis additionne
+    const round05 = (n: number) => Math.round(n * 20) / 20;
+    const productTVA = products.reduce((sum, p) => {
       const qty = quantities[p.ref] || 0;
       if (qty === 0) return sum;
       const paid = isAdmin || !p.promoEligible ? qty : calcPromo(qty).paid;
-      return sum + paid * p.price;
+      const lineHT = paid * p.price;
+      const rate = p.category === "Nutricosmetics" ? 0.026 : 0.081;
+      return sum + round05(lineHT * rate);
     }, 0);
-    const otherSubtotal = subtotal - nutriSubtotal;
+    const offerTVA = offers.reduce((sum, o) => {
+      const qty = offerQtys[o.id] || 0;
+      if (qty === 0) return sum;
+      return sum + round05(qty * o.price * 0.081);
+    }, 0);
     const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    return Math.round((nutriSubtotal * 1.026 + (otherSubtotal + shipping) * 1.081) * 20) / 20;
-  }, [quantities, subtotal, products, isAdmin]);
+    const shippingTVA = shipping > 0 ? round05(shipping * 0.081) : 0;
+    return Math.round((subtotal + shipping + productTVA + offerTVA + shippingTVA) * 100) / 100;
+  }, [quantities, offerQtys, subtotal, products, offers, isAdmin]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
