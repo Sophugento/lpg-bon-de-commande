@@ -19,20 +19,24 @@ async function fetchSheet(sheetName: string): Promise<Record<string, unknown>[]>
   const end = text.lastIndexOf("}") + 1;
   const table: GvizTable = JSON.parse(text.slice(start, end)).table;
   // Trim labels and strip any 📌 section marker that got merged into the header cell during Excel import
-  const labels = table.cols.map((c) => {
+  let labels = table.cols.map((c) => {
     const label = c.label.trim();
     const markerIdx = label.indexOf(" 📌");
     return markerIdx >= 0 ? label.slice(0, markerIdx) : label;
   });
-  return table.rows
-    .filter((row) => row !== null && row.c !== null)
-    .map((row) => {
-      const obj: Record<string, unknown> = {};
-      row!.c.forEach((cell, i) => {
-        obj[labels[i]] = cell?.v ?? "";
-      });
-      return obj;
+  let dataRows = table.rows.filter((row) => row !== null && row.c !== null);
+  // When gviz returns empty labels (no recognised header row), use first data row as headers
+  if (labels.every((l) => l === "") && dataRows.length > 0) {
+    labels = dataRows[0]!.c.map((cell) => (cell?.v != null ? String(cell.v).trim() : ""));
+    dataRows = dataRows.slice(1);
+  }
+  return dataRows.map((row) => {
+    const obj: Record<string, unknown> = {};
+    row!.c.forEach((cell, i) => {
+      obj[labels[i]] = cell?.v ?? "";
     });
+    return obj;
+  });
 }
 
 function str(v: unknown): string {
