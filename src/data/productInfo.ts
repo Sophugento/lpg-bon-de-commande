@@ -405,14 +405,14 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     descriptionDe: "Silikonpinsel für eine präzise Pflege-Anwendung.",
     benefits: ["Silicone ultra-doux", "Application précise", "Facile à nettoyer"],
     benefitsDe: ["Ultra-weiches Silikon", "Präzise Anwendung", "Leicht zu reinigen"],
-    imageUrl: "/images/products/marketing_Marketing_GOODIES_main_01.png",
+    imageUrl: "https://drive.google.com/thumbnail?id=1PLw29T85DMK_mEzsodj8kvgy1r2z_M6r&sz=w400",
   },
   "PATCH SILICONE": {
     description: "Patchs visage réutilisables en silicone pour lisser et hydrater la peau.",
     descriptionDe: "Wiederverwendbare Silikon-Gesichtspatches zum Glätten und Feuchtigkeitsspenden.",
     benefits: ["Réutilisables jusqu'à 30x", "Lisse les rides", "Silicone médical"],
     benefitsDe: ["Bis zu 30x wiederverwendbar", "Glättet Falten", "Medizinisches Silikon"],
-    imageUrl: "/images/products/marketing_Marketing_GOODIES_main_05.png",
+    imageUrl: "https://drive.google.com/thumbnail?id=1luuvtCFyAA6PM0H1DmBTuh4Jsq_0xFQD&sz=w400",
   },
 
   // ── TEXTILES ───────────────────────────────────────────────────────────
@@ -567,6 +567,13 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     benefitsDe: ["Kompatibel mit Lift 10 & 20", "Vollständiges Zubehör", "Professioneller Einsatz"],
     imageUrl: "/images/products/kit_endermologie.png",
   },
+  "KIT VISAGE ENDERMOLOGIE — LIFT 10 ET 20": {
+    description: "Kit Endermologie complet pour les appareils LPG Lift 10 et Lift 20.",
+    descriptionDe: "Vollständiges Endermologie-Kit für LPG Lift 10 und Lift 20 Geräte.",
+    benefits: ["Compatible Lift 10 & 20", "Accessoires complets", "Usage professionnel"],
+    benefitsDe: ["Kompatibel mit Lift 10 & 20", "Vollständiges Zubehör", "Professioneller Einsatz"],
+    imageUrl: "https://drive.google.com/thumbnail?id=12l2gSmjQn51sq5iQnGmoWVAprUnK4Yw1&sz=w400",
+  },
   "BOX 6x FILTRE": {
     description: "Box de 6 filtres de remplacement pour appareils LPG.",
     descriptionDe: "Box mit 6 Ersatzfiltern für LPG-Geräte.",
@@ -622,5 +629,42 @@ export const PRODUCT_INFO: Record<string, ProductInfo> = {
     benefits: ["Hygiénique", "Usage cabine", "Coloris blanc"],
     benefitsDe: ["Hygienisch", "Kabinengebrauch", "Weiße Farbe"],
     imageUrl: "/images/products/tongs.jpg",
+  },
+  "PEIGNOIR 100% COTON": {
+    description: "Peignoir 100% coton LPG.",
+    descriptionDe: "Bademantel 100% Baumwolle LPG.",
+    benefits: ["100% coton doux", "Marquage LPG brodé", "Confort optimal"],
+    benefitsDe: ["100% weiche Baumwolle", "Eingesticktes LPG-Logo", "Optimaler Komfort"],
+    imageUrl: "https://drive.google.com/thumbnail?id=1JLYVjq0SmD-u4xxJYvxlHR8AqDHYbM5P&sz=w400",
+  },
+
+  // ── GOODIES 2026 ───────────────────────────────────────────────────────
+  "BANDEAU NOIR 2026": {
+    description: "Bandeau noir LPG — édition 2026.",
+    descriptionDe: "Schwarzes LPG-Stirnband — 2026.",
+    benefits: ["Accessoire cabine", "Maintien parfait", "Design LPG"],
+    benefitsDe: ["Kabinenzubehör", "Perfekter Halt", "LPG-Design"],
+    imageUrl: "https://drive.google.com/thumbnail?id=1Bs4P1URqxzce5EuUnbDUH7qxEGjsi08B&sz=w400",
+  },
+  "CORDE A SAUTER 2026": {
+    description: "Corde à sauter LPG — édition 2026.",
+    descriptionDe: "LPG-Sprungseil — 2026.",
+    benefits: ["Outil minceur actif", "Design LPG", "Idéale pour le coaching"],
+    benefitsDe: ["Aktives Schlankheitstool", "LPG-Design", "Ideal für Coaching"],
+    imageUrl: "https://drive.google.com/thumbnail?id=150cOP6nj_yBhYuojbB5KBt5DEDU3jqpo&sz=w400",
+  },
+  "POSTER RENTREE 2026": {
+    description: "Poster vitrine rentrée 2026 — à afficher en cabine.",
+    descriptionDe: "Schaufensterposter Herbst 2026.",
+    benefits: ["Format affichage cabine", "Impression premium", "Édition 2026"],
+    benefitsDe: ["Kabinenformat", "Premium-Druck", "2026-Edition"],
+    imageUrl: "https://drive.google.com/thumbnail?id=1AaSmCWAv6XVHJqSuB4vTADwEtdZ59fFi&sz=w400",
+  },
+  "PRESENTOIR STOCKER MASQUES BIO CELL 2026": {
+    description: "Présentoir de stockage pour masques Bio-Cellulose — édition 2026.",
+    descriptionDe: "Aufbewahrungsständer für Bio-Cellulose-Masken — 2026.",
+    benefits: ["Stockage ordonné", "Compatible masques Biocel", "Design 2026"],
+    benefitsDe: ["Geordnete Lagerung", "Kompatibel mit Biocel-Masken", "2026-Design"],
+    imageUrl: "https://drive.google.com/thumbnail?id=1EZvh_nDnHozA4CUA6tg48KO9PkYrvKGY&sz=w400",
   },
 };
