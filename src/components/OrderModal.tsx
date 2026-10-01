@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 // Liste des commerciales — ajouter ici les nouvelles adresses email
 const COMMERCIALES = [
   "nathalie.madaire@lpgswitzerland.com",
-  "jennifer.escobar@lpgswitzerland.com",
-  "terence.martel@lpgswitzerland.com",
+  "sahondra.ralaison@lpgswitzerland.com",
 ];
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
 import { calcPromo, formatCHF } from "@/lib/utils";
