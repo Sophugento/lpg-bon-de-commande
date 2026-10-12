@@ -4,6 +4,54 @@ import { PRODUCTS, OFFERS } from "@/data/products";
 import { PRODUCT_INFO } from "@/data/productInfo";
 
 const SHEET_ID = "1Hi3Y28psXFNXvOeFaKqtxgATeC9bXVTk";
+// Dossier Drive public "Images" — photos des goodies, matériel marketing, textiles, etc.
+const DRIVE_IMAGES_FOLDER = "1r542Uo-xuOjHnNnHbp-G3kJZSRT4oNrQ";
+// Ces catégories gardent les images du site LPG
+const LPG_SITE_CATEGORIES = ["Corps", "Visage", "Nutricosmetics"];
+
+interface DriveFile {
+  id: string;
+  tokens: string[];
+}
+
+function nameTokens(name: string): string[] {
+  return name
+    .replace(/\.(png|jpe?g|webp|gif)$/i, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .split(/[^A-Z0-9]+/)
+    .filter(Boolean)
+    .map((t) => (t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t));
+}
+
+// Lists the public folder via the embedded view (no API key needed)
+async function fetchDriveImages(): Promise<DriveFile[]> {
+  try {
+    const res = await fetch(`https://drive.google.com/embeddedfolderview?id=${DRIVE_IMAGES_FOLDER}`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const re = /id="entry-([\w-]+)"[\s\S]*?class="flip-entry-title">([^<]+)</g;
+    const files: DriveFile[] = [];
+    for (let m = re.exec(html); m; m = re.exec(html)) {
+      files.push({ id: m[1], tokens: nameTokens(m[2]) });
+    }
+    return files;
+  } catch {
+    return [];
+  }
+}
+
+// A file matches when every word of its name appears in the product name; most specific file wins
+function matchDriveImage(productName: string, files: DriveFile[]): string | undefined {
+  const productTokens = new Set(nameTokens(productName));
+  let best: DriveFile | undefined;
+  for (const f of files) {
+    if (f.tokens.length === 0 || !f.tokens.every((t) => productTokens.has(t))) continue;
+    if (!best || f.tokens.length > best.tokens.length) best = f;
+  }
+  return best ? `https://drive.google.com/thumbnail?id=${best.id}&sz=w400` : undefined;
+}
 
 interface GvizTable {
   cols: { label: string; type: string }[];
@@ -59,10 +107,11 @@ export interface Catalog {
 
 export async function getCatalog(): Promise<Catalog> {
   try {
-    const [prodRows, offerRows, descRows] = await Promise.all([
+    const [prodRows, offerRows, descRows, driveFiles] = await Promise.all([
       fetchSheet("Produits"),
       fetchSheet("Offres spéciales"),
       fetchSheet("Descriptions & Images"),
+      fetchDriveImages(),
     ]);
 
     // ── Produits ───────────────────────────────────────────────────────
@@ -114,7 +163,18 @@ export async function getCatalog(): Promise<Catalog> {
       });
 
     // Merge: static data is the base, Google Sheet entries override when present
-    const mergedProductInfo = { ...PRODUCT_INFO, ...productInfo };
+    const mergedProductInfo: Record<string, ProductInfo> = { ...PRODUCT_INFO, ...productInfo };
+
+    // Drive photos override (or fill in) images for non-cosmetic categories
+    for (const p of products) {
+      if (LPG_SITE_CATEGORIES.includes(p.category)) continue;
+      const driveUrl = matchDriveImage(p.nameFr, driveFiles);
+      if (!driveUrl) continue;
+      const existing = mergedProductInfo[p.nameFr];
+      mergedProductInfo[p.nameFr] = existing
+        ? { ...existing, imageUrl: driveUrl }
+        : { description: "", descriptionDe: "", benefits: [], benefitsDe: [], imageUrl: driveUrl };
+    }
 
     return { products, offers, productInfo: mergedProductInfo };
   } catch (err) {
