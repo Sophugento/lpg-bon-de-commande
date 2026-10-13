@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import { calcPromo } from "@/lib/utils";
 import { TRANSLATIONS, Lang } from "@/lib/i18n";
 import CategorySection from "@/components/CategorySection";
-import OfferRow from "@/components/OfferRow";
 import OrderBar from "@/components/OrderBar";
 import OrderModal from "@/components/OrderModal";
 import AdminLoginModal from "@/components/AdminLoginModal";
@@ -34,10 +33,6 @@ export default function OrderForm({ catalog }: Props) {
 
   function updateQty(ref: string, qty: number) {
     setQuantities((q) => ({ ...q, [ref]: qty }));
-  }
-
-  function updateOfferQty(id: string, qty: number) {
-    setOfferQtys((q) => ({ ...q, [id]: qty }));
   }
 
   function handleAdminLogin() {
@@ -186,30 +181,6 @@ export default function OrderForm({ catalog }: Props) {
       </div>
 
       <div className="px-4">
-        {/* Offres spéciales */}
-        <div className="mb-3 rounded-2xl overflow-hidden border" style={{ borderColor: "#d598aa40" }}>
-          <div
-            className="px-4 py-3 flex items-center gap-2"
-            style={{ backgroundColor: "#d598aa15" }}
-          >
-            <span className="font-bold text-sm tracking-wide uppercase" style={{ color: "#d598aa" }}>
-              🎁 {t.offresSpeciales}
-            </span>
-          </div>
-          <div className="px-3 py-3" style={{ backgroundColor: "#f7f4f3" }}>
-            {offers.map((offer) => (
-              <OfferRow
-                key={offer.id}
-                offer={offer}
-                qty={offerQtys[offer.id] || 0}
-                onChange={updateOfferQty}
-                t={t}
-                lang={lang}
-              />
-            ))}
-          </div>
-        </div>
-
         {/* Catégories produits */}
         {categories.map((cat) => (
           <CategorySection
