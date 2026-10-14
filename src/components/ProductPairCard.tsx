@@ -111,6 +111,11 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                 {translateSize(revente.size, lang)}
               </p>
               <p className="text-base font-bold mt-1" style={{ color: "#2d2020" }}>
+                {revente.originalPrice !== undefined && (
+                  <span className="text-xs font-normal line-through mr-1.5" style={{ color: "#bba8a1" }}>
+                    {formatCHF(revente.originalPrice)}
+                  </span>
+                )}
                 {formatCHF(revente.price)}
               </p>
               {revente.retailPrice ? (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { calcPromo } from "@/lib/utils";
+import { calcPromo, christmasPrice, isChristmasEligible, ChristmasOffer, CHRISTMAS_OFFER_LABELS } from "@/lib/utils";
 import { TRANSLATIONS, Lang } from "@/lib/i18n";
 import CategorySection from "@/components/CategorySection";
 import OrderBar from "@/components/OrderBar";
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function OrderForm({ catalog }: Props) {
-  const { products, offers, productInfo } = catalog;
+  const { products: catalogProducts, offers, productInfo } = catalog;
 
   const [lang, setLang] = useState<Lang>("fr");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -24,6 +24,15 @@ export default function OrderForm({ catalog }: Props) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [freeQuantities, setFreeQuantities] = useState<Record<string, number>>({});
+  const [christmasOffer, setChristmasOffer] = useState<ChristmasOffer>(0);
+
+  const activeOffer = isAdmin ? christmasOffer : 0;
+  const products = useMemo(() => {
+    if (!activeOffer) return catalogProducts;
+    return catalogProducts.map((p) =>
+      isChristmasEligible(p) ? { ...p, originalPrice: p.price, price: christmasPrice(p.price, activeOffer) } : p
+    );
+  }, [catalogProducts, activeOffer]);
 
   useEffect(() => {
     setIsAdmin(sessionStorage.getItem("lpg_admin") === "1");
@@ -45,6 +54,7 @@ export default function OrderForm({ catalog }: Props) {
     sessionStorage.removeItem("lpg_admin");
     setIsAdmin(false);
     setFreeQuantities({});
+    setChristmasOffer(0);
   }
 
   function updateFreeQty(ref: string, qty: number) {
@@ -157,6 +167,22 @@ export default function OrderForm({ catalog }: Props) {
         </div>
       )}
 
+      {isAdmin && (
+        <div className="mx-4 mt-2 rounded-xl px-3 py-2.5 space-y-2 text-xs" style={{ backgroundColor: "white", border: "1px solid #ded5d1" }}>
+          {([1, 2] as const).map((n) => (
+            <label key={n} className="flex items-center gap-2 cursor-pointer" style={{ color: "#2d2020" }}>
+              <input
+                type="checkbox"
+                checked={christmasOffer === n}
+                onChange={(e) => setChristmasOffer(e.target.checked ? n : 0)}
+                className="w-4 h-4 rounded accent-[#d598aa]"
+              />
+              <span className={christmasOffer === n ? "font-semibold" : ""}>🎄 {CHRISTMAS_OFFER_LABELS[n]}</span>
+            </label>
+          ))}
+        </div>
+      )}
+
       {/* Règles */}
       <div
         className="mx-4 mt-4 mb-3 rounded-xl p-3 text-xs space-y-1"
@@ -215,6 +241,7 @@ export default function OrderForm({ catalog }: Props) {
           isAdmin={isAdmin}
           freeQuantities={freeQuantities}
           totalTTC={totalTTC}
+          christmasOffer={activeOffer}
         />
       )}
 

@@ -15,6 +15,21 @@ export function calcPromo(qty: number): { paid: number; free: number } {
   return { paid: qty, free: 0 };
 }
 
+export type ChristmasOffer = 0 | 1 | 2;
+
+export const CHRISTMAS_OFFER_LABELS: Record<1 | 2, string> = {
+  1: "Offre de Noël 1 — -50% sur Yeux & Lèvres (revente)",
+  2: "Offre de Noël 2 — Yeux & Lèvres (revente) à 10.- CHF",
+};
+
+export function isChristmasEligible(p: { category: string; subcategory: string; type: string }): boolean {
+  return p.category === "Visage" && p.subcategory === "Yeux & Lèvres" && p.type === "revente";
+}
+
+export function christmasPrice(price: number, offer: 1 | 2): number {
+  return offer === 1 ? Math.round(price * 50) / 100 : 10;
+}
+
 export function translateSize(size: string, lang: string): string {
   if (lang === "fr") return size;
   return size

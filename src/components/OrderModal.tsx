@@ -45,6 +45,7 @@ interface Props {
   isAdmin?: boolean;
   freeQuantities?: Record<string, number>;
   totalTTC?: number;
+  christmasOffer?: 0 | 1 | 2;
 }
 
 const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
@@ -62,6 +63,7 @@ export default function OrderModal({
   isAdmin,
   freeQuantities,
   totalTTC: totalTTCProp,
+  christmasOffer,
 }: Props) {
   const [c, setC] = useState<ContactInfo>({
     firstName: "",
@@ -172,6 +174,7 @@ export default function OrderModal({
           shipping,
           total,
           totalTTC,
+          christmasOffer: christmasOffer || undefined,
           lang,
         }),
       });

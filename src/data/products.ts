@@ -9,6 +9,7 @@ export interface Product {
   type: ProductType;
   size: string;
   price: number;
+  originalPrice?: number;
   retailPrice?: number;
   category: string;
   subcategory: string;

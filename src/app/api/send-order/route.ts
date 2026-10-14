@@ -43,11 +43,27 @@ interface OrderPayload {
   shipping: number;
   total: number;
   totalTTC?: number;
+  christmasOffer?: 1 | 2;
   lang: "fr" | "de";
 }
 
 function chf(n: number) {
   return n.toFixed(2).replace(".", ",") + " CHF";
+}
+
+function christmasNote(offer: 1 | 2 | undefined, lang: "fr" | "de"): string {
+  if (offer !== 1 && offer !== 2) return "";
+  const text = {
+    fr: {
+      1: "Offre de Noël 1 appliquée : -50% sur les produits Yeux & Lèvres (revente)",
+      2: "Offre de Noël 2 appliquée : produits Yeux & Lèvres (revente) à 10.- CHF",
+    },
+    de: {
+      1: "Weihnachtsangebot 1 angewendet: -50% auf Augen & Lippen (Verkauf)",
+      2: "Weihnachtsangebot 2 angewendet: Augen & Lippen (Verkauf) zu CHF 10.–",
+    },
+  }[lang][offer];
+  return `<p style="margin:0 0 12px;padding:10px 12px;font-size:13px;font-weight:700;color:#2d2020;background:#f0ebe9;border-left:4px solid #d598aa;font-family:Arial,sans-serif">🎄 ${text}</p>`;
 }
 
 function buildHtml(payload: OrderPayload): string {
@@ -118,6 +134,7 @@ function buildHtml(payload: OrderPayload): string {
   }).join("");
 
   const orderTableHtml = `
+    ${christmasNote(payload.christmasOffer, lang)}
     <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
     <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
       ${tableHead}<tbody>${buildRows()}</tbody>
@@ -276,6 +293,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
           </tr>
         </table>
 
+        ${christmasNote(payload.christmasOffer, lang)}
         ${productTablesHtml}
 
         <!-- Totals -->
