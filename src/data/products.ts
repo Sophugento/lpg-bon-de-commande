@@ -10,6 +10,9 @@ export interface Product {
   size: string;
   price: number;
   originalPrice?: number;
+  // Units sold at offerPrice instead of price (e.g. Christmas offer 3 refills)
+  offerQty?: number;
+  offerPrice?: number;
   retailPrice?: number;
   category: string;
   subcategory: string;

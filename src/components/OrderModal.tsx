@@ -8,7 +8,7 @@ const COMMERCIALES = [
   "sahondra.ralaison@lpgswitzerland.com",
 ];
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
-import { calcPromo, formatCHF } from "@/lib/utils";
+import { calcPromo, formatCHF, lineAmount, lineSegments } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
 
 interface Address {
@@ -46,6 +46,7 @@ interface Props {
   freeQuantities?: Record<string, number>;
   totalTTC?: number;
   christmasOffer?: 0 | 1 | 2;
+  nightCareOffer?: boolean;
 }
 
 const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
@@ -64,6 +65,7 @@ export default function OrderModal({
   freeQuantities,
   totalTTC: totalTTCProp,
   christmasOffer,
+  nightCareOffer,
 }: Props) {
   const [c, setC] = useState<ContactInfo>({
     firstName: "",
@@ -132,7 +134,7 @@ export default function OrderModal({
         description: o.description,
         gift: o.gift,
       })),
-      ...selectedProducts.map((p) => {
+      ...selectedProducts.flatMap((p) => {
         const qty = quantities[p.ref] || 0;
         let paid: number, free: number;
         if (isAdmin) {
@@ -143,16 +145,14 @@ export default function OrderModal({
           paid = promo.paid;
           free = promo.free;
         }
-        return {
-          ref: p.ref,
-          name: lang === "de" ? p.nameDe : p.nameFr,
-          type: p.type,
-          size: p.size,
-          qty: paid + free,
-          unitPrice: p.price,
-          freeQty: free,
-          lineTotal: paid * p.price,
-        };
+        const base = { ref: p.ref, name: lang === "de" ? p.nameDe : p.nameFr, type: p.type, size: p.size };
+        const segments = lineSegments(p, paid);
+        if (segments.length === 0) segments.push({ qty: 0, unitPrice: p.price });
+        // Free units go on the last (regular-price) line
+        return segments.map((seg, i) => {
+          const segFree = i === segments.length - 1 ? free : 0;
+          return { ...base, qty: seg.qty + segFree, unitPrice: seg.unitPrice, freeQty: segFree, lineTotal: seg.qty * seg.unitPrice };
+        });
       }),
     ];
 
@@ -175,6 +175,7 @@ export default function OrderModal({
           total,
           totalTTC,
           christmasOffer: christmasOffer || undefined,
+          nightCareOffer: nightCareOffer || undefined,
           lang,
         }),
       });
@@ -224,7 +225,7 @@ export default function OrderModal({
                       return (
                         <div key={p.ref} className="flex justify-between text-xs">
                           <span className="flex-1 pr-2" style={{ color: "#2d2020" }}>{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}</span>
-                          <span className="font-semibold">{formatCHF(qty * p.price)}</span>
+                          <span className="font-semibold">{formatCHF(lineAmount(p, qty))}</span>
                         </div>
                       );
                     })}
@@ -340,7 +341,7 @@ export default function OrderModal({
                     return (
                       <div key={p.ref} className="flex justify-between text-xs">
                         <span className="flex-1 truncate pr-2">{lang === "de" ? p.nameDe : p.nameFr}{p.size ? ` (${p.size})` : ""} ×{qty}</span>
-                        <span className="font-semibold">{formatCHF(qty * p.price)}</span>
+                        <span className="font-semibold">{formatCHF(lineAmount(p, qty))}</span>
                       </div>
                     );
                   })}

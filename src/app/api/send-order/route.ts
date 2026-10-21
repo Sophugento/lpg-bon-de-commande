@@ -44,11 +44,23 @@ interface OrderPayload {
   total: number;
   totalTTC?: number;
   christmasOffer?: 1 | 2;
+  nightCareOffer?: boolean;
   lang: "fr" | "de";
 }
 
 function chf(n: number) {
   return n.toFixed(2).replace(".", ",") + " CHF";
+}
+
+const noteStyle = "margin:0 0 12px;padding:10px 12px;font-size:13px;font-weight:700;color:#2d2020;background:#f0ebe9;border-left:4px solid #d598aa;font-family:Arial,sans-serif";
+
+function christmasNotes(payload: OrderPayload, lang: "fr" | "de"): string {
+  const night = payload.nightCareOffer
+    ? `<p style="${noteStyle}">🎄 ${lang === "de"
+        ? "Weihnachtsangebot 3 angewendet: ab 5 Nachtpflegen, 1 Nachfüllung zu CHF 5.– pro Nachtpflege"
+        : "Offre de Noël 3 appliquée : dès 5 soins nuit, 1 recharge à 5.- CHF par soin nuit"}</p>`
+    : "";
+  return christmasNote(payload.christmasOffer, lang) + night;
 }
 
 function christmasNote(offer: 1 | 2 | undefined, lang: "fr" | "de"): string {
@@ -63,7 +75,7 @@ function christmasNote(offer: 1 | 2 | undefined, lang: "fr" | "de"): string {
       2: "Weihnachtsangebot 2 angewendet: Augen & Lippen (Verkauf) zu CHF 10.–",
     },
   }[lang][offer];
-  return `<p style="margin:0 0 12px;padding:10px 12px;font-size:13px;font-weight:700;color:#2d2020;background:#f0ebe9;border-left:4px solid #d598aa;font-family:Arial,sans-serif">🎄 ${text}</p>`;
+  return `<p style="${noteStyle}">🎄 ${text}</p>`;
 }
 
 function buildHtml(payload: OrderPayload): string {
@@ -134,7 +146,7 @@ function buildHtml(payload: OrderPayload): string {
   }).join("");
 
   const orderTableHtml = `
-    ${christmasNote(payload.christmasOffer, lang)}
+    ${christmasNotes(payload, lang)}
     <h2 style="font-size:11px;color:#bba8a1;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">${labels.order}</h2>
     <table style="width:100%;border-collapse:collapse;border:1px solid #ded5d1;border-radius:8px;overflow:hidden">
       ${tableHead}<tbody>${buildRows()}</tbody>
@@ -293,7 +305,7 @@ function buildConfirmHtml(payload: OrderPayload): string {
           </tr>
         </table>
 
-        ${christmasNote(payload.christmasOffer, lang)}
+        ${christmasNotes(payload, lang)}
         ${productTablesHtml}
 
         <!-- Totals -->

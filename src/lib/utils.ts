@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Product } from "@/data/products";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,6 +29,44 @@ export function isChristmasEligible(p: { category: string; subcategory: string; 
 
 export function christmasPrice(price: number, offer: 1 | 2): number {
   return offer === 1 ? Math.round(price * 50) / 100 : 10;
+}
+
+export const NIGHT_CARE_OFFER_LABEL = "Offre de Noël 3 — dès 5 soins nuit achetés, 1 recharge à 5.- CHF par soin nuit";
+const NIGHT_CARE_MIN = 5;
+const NIGHT_CARE_REFILL_PRICE = 5;
+
+function isNightCare(p: Product): boolean {
+  return p.category === "Visage" && p.nameFr.toUpperCase().startsWith("SOIN NUIT");
+}
+
+// Every night care bought (all scents mixed) unlocks one refill at 5.- once at least 5 are bought
+export function applyNightCareOffer(products: Product[], quantities: Record<string, number>): Product[] {
+  const bought = products
+    .filter((p) => isNightCare(p) && p.type === "revente")
+    .reduce((sum, p) => sum + (quantities[p.ref] || 0), 0);
+  if (bought < NIGHT_CARE_MIN) return products;
+  let remaining = bought;
+  return products.map((p) => {
+    if (!isNightCare(p) || p.type !== "recharge" || remaining <= 0) return p;
+    const discounted = Math.min(quantities[p.ref] || 0, remaining);
+    remaining -= discounted;
+    return discounted > 0 ? { ...p, offerQty: discounted, offerPrice: NIGHT_CARE_REFILL_PRICE } : p;
+  });
+}
+
+export function lineSegments(
+  p: Pick<Product, "price" | "offerQty" | "offerPrice">,
+  qty: number
+): { qty: number; unitPrice: number }[] {
+  const discounted = p.offerPrice !== undefined ? Math.min(qty, p.offerQty ?? 0) : 0;
+  const segments: { qty: number; unitPrice: number }[] = [];
+  if (discounted > 0) segments.push({ qty: discounted, unitPrice: p.offerPrice! });
+  if (qty - discounted > 0) segments.push({ qty: qty - discounted, unitPrice: p.price });
+  return segments;
+}
+
+export function lineAmount(p: Pick<Product, "price" | "offerQty" | "offerPrice">, qty: number): number {
+  return lineSegments(p, qty).reduce((sum, s) => sum + s.qty * s.unitPrice, 0);
 }
 
 export function translateSize(size: string, lang: string): string {

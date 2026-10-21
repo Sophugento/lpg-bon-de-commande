@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { calcPromo, christmasPrice, isChristmasEligible, ChristmasOffer, CHRISTMAS_OFFER_LABELS } from "@/lib/utils";
+import { calcPromo, christmasPrice, isChristmasEligible, ChristmasOffer, CHRISTMAS_OFFER_LABELS, NIGHT_CARE_OFFER_LABEL, applyNightCareOffer, lineAmount, lineSegments } from "@/lib/utils";
 import { TRANSLATIONS, Lang } from "@/lib/i18n";
 import CategorySection from "@/components/CategorySection";
 import OrderBar from "@/components/OrderBar";
@@ -25,14 +25,18 @@ export default function OrderForm({ catalog }: Props) {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [freeQuantities, setFreeQuantities] = useState<Record<string, number>>({});
   const [christmasOffer, setChristmasOffer] = useState<ChristmasOffer>(0);
+  const [nightCareOffer, setNightCareOffer] = useState(false);
 
   const activeOffer = isAdmin ? christmasOffer : 0;
+  const activeNightCareOffer = isAdmin && nightCareOffer;
   const products = useMemo(() => {
-    if (!activeOffer) return catalogProducts;
-    return catalogProducts.map((p) =>
-      isChristmasEligible(p) ? { ...p, originalPrice: p.price, price: christmasPrice(p.price, activeOffer) } : p
-    );
-  }, [catalogProducts, activeOffer]);
+    const priced = activeOffer
+      ? catalogProducts.map((p) =>
+          isChristmasEligible(p) ? { ...p, originalPrice: p.price, price: christmasPrice(p.price, activeOffer) } : p
+        )
+      : catalogProducts;
+    return activeNightCareOffer ? applyNightCareOffer(priced, quantities) : priced;
+  }, [catalogProducts, activeOffer, activeNightCareOffer, quantities]);
 
   useEffect(() => {
     setIsAdmin(sessionStorage.getItem("lpg_admin") === "1");
@@ -55,6 +59,7 @@ export default function OrderForm({ catalog }: Props) {
     setIsAdmin(false);
     setFreeQuantities({});
     setChristmasOffer(0);
+    setNightCareOffer(false);
   }
 
   function updateFreeQty(ref: string, qty: number) {
@@ -66,7 +71,7 @@ export default function OrderForm({ catalog }: Props) {
       const qty = quantities[p.ref] || 0;
       if (qty === 0) return sum;
       const paid = isAdmin || !p.promoEligible ? qty : calcPromo(qty).paid;
-      return sum + paid * p.price;
+      return sum + lineAmount(p, paid);
     }, 0);
     const offerTotal = offers.reduce(
       (sum, o) => sum + (offerQtys[o.id] || 0) * o.price,
@@ -82,9 +87,8 @@ export default function OrderForm({ catalog }: Props) {
       const qty = quantities[p.ref] || 0;
       if (qty === 0) return sum;
       const paid = isAdmin || !p.promoEligible ? qty : calcPromo(qty).paid;
-      const lineHT = paid * p.price;
       const rate = p.category === "Nutricosmetics" ? 0.026 : 0.081;
-      return sum + round05(lineHT * rate);
+      return sum + lineSegments(p, paid).reduce((s, seg) => s + round05(seg.qty * seg.unitPrice * rate), 0);
     }, 0);
     const offerTVA = offers.reduce((sum, o) => {
       const qty = offerQtys[o.id] || 0;
@@ -180,6 +184,15 @@ export default function OrderForm({ catalog }: Props) {
               <span className={christmasOffer === n ? "font-semibold" : ""}>🎄 {CHRISTMAS_OFFER_LABELS[n]}</span>
             </label>
           ))}
+          <label className="flex items-center gap-2 cursor-pointer" style={{ color: "#2d2020" }}>
+            <input
+              type="checkbox"
+              checked={nightCareOffer}
+              onChange={(e) => setNightCareOffer(e.target.checked)}
+              className="w-4 h-4 rounded accent-[#d598aa]"
+            />
+            <span className={nightCareOffer ? "font-semibold" : ""}>🎄 {NIGHT_CARE_OFFER_LABEL}</span>
+          </label>
         </div>
       )}
 
@@ -242,6 +255,7 @@ export default function OrderForm({ catalog }: Props) {
           freeQuantities={freeQuantities}
           totalTTC={totalTTC}
           christmasOffer={activeOffer}
+          nightCareOffer={activeNightCareOffer}
         />
       )}
 

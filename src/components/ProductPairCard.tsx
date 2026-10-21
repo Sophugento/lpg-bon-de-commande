@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Product } from "@/data/products";
 import { ProductInfo } from "@/data/productInfo";
-import { calcPromo, formatCHF, translateSize } from "@/lib/utils";
+import { calcPromo, formatCHF, lineAmount, translateSize } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
 import QuantitySelector from "./QuantitySelector";
 import ProductInfoModal from "./ProductInfoModal";
@@ -195,6 +195,11 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                 <p className="text-base font-bold mt-1" style={{ color: "#2d2020" }}>
                   {formatCHF(prod.price)}
                 </p>
+                {prod.offerQty && prod.offerPrice !== undefined ? (
+                  <p className="text-[11px] font-semibold" style={{ color: "#bf7585" }}>
+                    🎄 {prod.offerQty} × {formatCHF(prod.offerPrice)}
+                  </p>
+                ) : null}
                 {recharge && prod.retailPrice ? (
                   <p className="text-[10px] mb-2" style={{ color: "#bba8a1" }}>
                     {t.prixVente} {formatCHF(prod.retailPrice)}
@@ -214,7 +219,7 @@ export default function ProductPairCard({ products, quantities, onChange, t, lan
                     </div>
                     {qty > 0 && (
                       <p className="text-xs font-semibold" style={{ color: "#bba8a1" }}>
-                        = {formatCHF(qty * prod.price)}
+                        = {formatCHF(lineAmount(prod, qty))}
                       </p>
                     )}
                   </div>
