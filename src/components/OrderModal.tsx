@@ -106,7 +106,7 @@ export default function OrderModal({
     (c.delivery.address.trim() && c.delivery.postalCode.trim() && c.delivery.city.trim());
 
   const isValid = isAdmin
-    ? true
+    ? /\S+@\S+\.\S+/.test(c.email.trim())
     : !!(c.firstName.trim() &&
         c.lastName.trim() &&
         c.company.trim() &&
@@ -418,7 +418,7 @@ export default function OrderModal({
             </p>
             {isAdmin && (
               <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: "#f0ebe9", color: "#bba8a1" }}>
-                Champs facultatifs
+                Champs facultatifs sauf e-mail
               </span>
             )}
           </div>
@@ -434,7 +434,7 @@ export default function OrderModal({
               <Field label={fl(t.city, isAdmin)} value={c.city} onChange={(v) => upd("city", v)} />
             </div>
           </div>
-          <Field label={fl(t.email, isAdmin)} type="email" value={c.email} onChange={(v) => upd("email", v)} />
+          <Field label={t.email} type="email" value={c.email} onChange={(v) => upd("email", v)} />
           <Field label={fl(t.phone, isAdmin)} type="tel" value={c.phone} onChange={(v) => upd("phone", v)} />
 
           {isAdmin && (
