@@ -2,6 +2,7 @@ import { Product, Offer } from "@/data/products";
 import { ProductInfo } from "@/data/productInfo";
 import { PRODUCTS, OFFERS } from "@/data/products";
 import { PRODUCT_INFO } from "@/data/productInfo";
+import { NO_REF_PREFIX } from "@/lib/utils";
 
 const SHEET_ID = "1Hi3Y28psXFNXvOeFaKqtxgATeC9bXVTk";
 // Dossier Drive public "Images" — photos des goodies, matériel marketing, textiles, etc.
@@ -116,9 +117,10 @@ export async function getCatalog(): Promise<Catalog> {
 
     // ── Produits ───────────────────────────────────────────────────────
     const products: Product[] = prodRows
-      .filter((r) => str(r["Réf."]) && !str(r["Réf."]).startsWith("📌"))
+      // Off-stock items (e.g. stickers) have no Winbiz ref: keep them, keyed by name/type/size
+      .filter((r) => str(r["Nom FR"]).trim() && !str(r["Réf."]).startsWith("📌"))
       .map((r) => ({
-        ref: str(r["Réf."]),
+        ref: str(r["Réf."]) || `${NO_REF_PREFIX}${str(r["Nom FR"]).trim()}|${str(r["Type"])}|${str(r["Contenant"])}`,
         nameFr: str(r["Nom FR"]),
         nameDe: str(r["Nom DE"]),
         type: str(r["Type"]) as Product["type"],

@@ -8,7 +8,7 @@ const COMMERCIALES = [
   "sahondra.ralaison@lpgswitzerland.com",
 ];
 import { Product, Offer, SHIPPING_COST, SHIPPING_THRESHOLD } from "@/data/products";
-import { calcPromo, formatCHF, lineAmount, lineSegments } from "@/lib/utils";
+import { calcPromo, displayRef, formatCHF, lineAmount, lineSegments } from "@/lib/utils";
 import { T, Lang } from "@/lib/i18n";
 
 interface Address {
@@ -145,7 +145,7 @@ export default function OrderModal({
           paid = promo.paid;
           free = promo.free;
         }
-        const base = { ref: p.ref, name: lang === "de" ? p.nameDe : p.nameFr, type: p.type, size: p.size };
+        const base = { ref: displayRef(p.ref), name: lang === "de" ? p.nameDe : p.nameFr, type: p.type, size: p.size };
         const segments = lineSegments(p, paid);
         if (segments.length === 0) segments.push({ qty: 0, unitPrice: p.price });
         // Free units go on the last (regular-price) line

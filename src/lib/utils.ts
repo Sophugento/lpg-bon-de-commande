@@ -16,6 +16,12 @@ export function calcPromo(qty: number): { paid: number; free: number } {
   return { paid: qty, free: 0 };
 }
 
+export const NO_REF_PREFIX = "sans-ref:";
+
+export function displayRef(ref: string): string {
+  return ref.startsWith(NO_REF_PREFIX) ? "" : ref;
+}
+
 export type ChristmasOffer = 0 | 1 | 2;
 
 export const CHRISTMAS_OFFER_LABELS: Record<1 | 2, string> = {
