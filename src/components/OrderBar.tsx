@@ -10,10 +10,11 @@ interface Props {
   t: T;
   isAdmin?: boolean;
   totalTTC?: number;
+  freeShipping?: boolean;
 }
 
-export default function OrderBar({ subtotal, onSubmit, t, isAdmin, totalTTC: totalTTCProp }: Props) {
-  const shipping = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
+export default function OrderBar({ subtotal, onSubmit, t, isAdmin, totalTTC: totalTTCProp, freeShipping }: Props) {
+  const shipping = freeShipping || subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
   const totalTTC = totalTTCProp ?? Math.round(total * 1.081 * 20) / 20;
   const missing = MIN_ORDER - subtotal;
@@ -36,7 +37,7 @@ export default function OrderBar({ subtotal, onSubmit, t, isAdmin, totalTTC: tot
               {subtotal === 0 ? "—" : shipping === 0 ? t.portOffert : formatCHF(SHIPPING_COST)}
             </span>
           </div>
-          {subtotal > 0 && subtotal < SHIPPING_THRESHOLD && (
+          {subtotal > 0 && subtotal < SHIPPING_THRESHOLD && !freeShipping && (
             <p className="text-[10px]" style={{ color: "#bba8a1" }}>{t.portOffertDes}</p>
           )}
           <div className="flex justify-between items-center pt-1.5 border-t" style={{ borderColor: "#ded5d1" }}>

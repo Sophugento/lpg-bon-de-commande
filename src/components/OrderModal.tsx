@@ -47,6 +47,7 @@ interface Props {
   totalTTC?: number;
   christmasOffer?: 0 | 1 | 2;
   nightCareOffer?: boolean;
+  freeShipping?: boolean;
 }
 
 const EMPTY_DELIVERY: Address = { company: "", address: "", postalCode: "", city: "" };
@@ -66,6 +67,7 @@ export default function OrderModal({
   totalTTC: totalTTCProp,
   christmasOffer,
   nightCareOffer,
+  freeShipping,
 }: Props) {
   const [c, setC] = useState<ContactInfo>({
     firstName: "",
@@ -84,7 +86,7 @@ export default function OrderModal({
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const shipping = freeShipping || subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
   const totalTTC = totalTTCProp ?? Math.round(total * 1.081 * 20) / 20;
 

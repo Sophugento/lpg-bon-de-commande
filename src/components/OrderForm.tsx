@@ -26,6 +26,8 @@ export default function OrderForm({ catalog }: Props) {
   const [freeQuantities, setFreeQuantities] = useState<Record<string, number>>({});
   const [christmasOffer, setChristmasOffer] = useState<ChristmasOffer>(0);
   const [nightCareOffer, setNightCareOffer] = useState(false);
+  const [freeShippingChecked, setFreeShippingChecked] = useState(false);
+  const freeShipping = isAdmin && freeShippingChecked;
 
   const activeOffer = isAdmin ? christmasOffer : 0;
   const activeNightCareOffer = isAdmin && nightCareOffer;
@@ -60,6 +62,7 @@ export default function OrderForm({ catalog }: Props) {
     setFreeQuantities({});
     setChristmasOffer(0);
     setNightCareOffer(false);
+    setFreeShippingChecked(false);
   }
 
   function updateFreeQty(ref: string, qty: number) {
@@ -95,10 +98,10 @@ export default function OrderForm({ catalog }: Props) {
       if (qty === 0) return sum;
       return sum + round05(qty * o.price * 0.081);
     }, 0);
-    const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const shipping = freeShipping || subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     const shippingTVA = shipping > 0 ? round05(shipping * 0.081) : 0;
     return Math.round((subtotal + shipping + productTVA + offerTVA + shippingTVA) * 100) / 100;
-  }, [quantities, offerQtys, subtotal, products, offers, isAdmin]);
+  }, [quantities, offerQtys, subtotal, products, offers, isAdmin, freeShipping]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
@@ -193,6 +196,15 @@ export default function OrderForm({ catalog }: Props) {
             />
             <span className={nightCareOffer ? "font-semibold" : ""}>🎄 {NIGHT_CARE_OFFER_LABEL}</span>
           </label>
+          <label className="flex items-center gap-2 cursor-pointer pt-2" style={{ color: "#2d2020", borderTop: "1px solid #f0ebe9" }}>
+            <input
+              type="checkbox"
+              checked={freeShippingChecked}
+              onChange={(e) => setFreeShippingChecked(e.target.checked)}
+              className="w-4 h-4 rounded accent-[#d598aa]"
+            />
+            <span className={freeShippingChecked ? "font-semibold" : ""}>🚚 Frais de port offerts (même sous {SHIPPING_THRESHOLD} CHF)</span>
+          </label>
         </div>
       )}
 
@@ -238,7 +250,7 @@ export default function OrderForm({ catalog }: Props) {
         ))}
       </div>
 
-      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} isAdmin={isAdmin} totalTTC={totalTTC} />
+      <OrderBar subtotal={subtotal} onSubmit={() => setModalOpen(true)} t={t} isAdmin={isAdmin} totalTTC={totalTTC} freeShipping={freeShipping} />
 
       {modalOpen && (
         <OrderModal
@@ -256,6 +268,7 @@ export default function OrderForm({ catalog }: Props) {
           totalTTC={totalTTC}
           christmasOffer={activeOffer}
           nightCareOffer={activeNightCareOffer}
+          freeShipping={freeShipping}
         />
       )}
 
